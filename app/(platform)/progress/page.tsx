@@ -92,7 +92,7 @@ export default function ProgressPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F2F2F2]">
+    <div className="min-h-screen bg-[#F2F2F2] max-w-md mx-auto">
       {/* Header with white background */}
       <div className="bg-white pb-4">
         <div className="max-w-md mx-auto px-4 pt-28">

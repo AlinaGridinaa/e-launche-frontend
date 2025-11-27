@@ -28,7 +28,7 @@ export default function MyProgressPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] pb-24">
+    <div className="min-h-screen bg-[#F5F5F5] pb-24 max-w-md mx-auto">
       {/* Header з градієнтом */}
       <div className="relative bg-gradient-to-br from-[#2466FF] to-[#10A3FE] rounded-b-2xl">
         <div className="relative  pt-14 pb-20">
@@ -183,7 +183,7 @@ export default function MyProgressPage() {
       </div>
 
       {/* Мій дохід - внизу з градієнтом */}
-      <div className="fixed bottom-20 left-0 right-0 px-4 pt-5 pb-5 bg-gradient-to-t from-[#F2F2F2]/70 to-transparent pointer-events-none">
+      <div className="fixed bottom-20 left-0 right-0 px-4 pt-5 pb-5 bg-gradient-to-t from-[#F2F2F2]/70 to-transparent pointer-events-none max-w-md mx-auto">
         <div className="bg-white rounded-xl border border-[#E7E7E7] p-3 shadow-sm pointer-events-auto">
           <div className="flex items-center gap-1">
             <div className="w-[35px] h-6 bg-white rounded-full flex items-center justify-center">
