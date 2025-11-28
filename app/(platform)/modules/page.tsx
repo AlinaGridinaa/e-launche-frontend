@@ -81,8 +81,8 @@ export default function ModulesPage() {
   return (
     <div className="min-h-screen bg-[#F2F2F2] max-w-md mx-auto">
       {/* Header with white background */}
-      <div className="bg-white pb-4">
-        <div className="max-w-md mx-auto px-4 pt-28">
+      <div className="bg-white pb-4 rounded-b-2xl shadow-sm">
+        <div className="max-w-md mx-auto px-4 pt-6">
           {/* Title */}
           <h1 className="text-2xl font-bold text-gray-900 mb-3">
             Програма навчання
