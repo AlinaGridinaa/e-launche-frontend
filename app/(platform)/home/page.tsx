@@ -2,7 +2,7 @@
 
 import { WelcomeBanner } from '@/components/home/WelcomeBanner';
 import { WeeklySchedule } from '@/components/home/WeeklySchedule';
-import { ProgramProgress } from '@/components/home/ProgramProgress';
+import { ProgramModules } from '@/components/home/ProgramModules';
 import { CommunityRules } from '@/components/home/CommunityRules';
 import { SupportButton } from '@/components/home/SupportButton';
 
@@ -19,7 +19,7 @@ export default function HomePage() {
           <WeeklySchedule />
 
           {/* Program Progress */}
-          <ProgramProgress />
+          <ProgramModules />
 
           {/* Community Rules */}
           <CommunityRules />

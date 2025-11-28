@@ -3,11 +3,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-export function ProgramProgress() {
+export function ProgramModules() {
   const progress = 10; // 1/10 модулів = 10%
 
   return (
-    <Link href="/progress">
+    <Link href="/modules">
       <div className="bg-gradient-to-r from-[#5B7FFF] to-[#4A6AE8] rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer mb-3">
         <div className="space-y-4">
           {/* Title */}

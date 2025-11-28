@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, ChevronDown, ChevronUp, Lock } from 'lucide-react';
+import { modulesService, Module as ApiModule } from '@/lib/services/modules.service';
 
 interface Lesson {
   id: number;
@@ -10,7 +11,7 @@ interface Lesson {
 }
 
 interface Module {
-  id: number;
+  id: string;
   category: string;
   title: string;
   lessonsCompleted: number;
@@ -21,75 +22,61 @@ interface Module {
   lessons: Lesson[];
 }
 
-export default function ProgressPage() {
-  const [expandedModuleId, setExpandedModuleId] = useState<number | null>(null);
-  
-  // Mock data
-  const totalModules = 10;
-  const completedModules = 0;
-  
-  const modules: Module[] = [
-    {
-      id: 0,
-      category: 'Переднавчання',
-      title: 'Мышление продюссера своей жизни',
-      lessonsCompleted: 5,
-      totalLessons: 6,
-      isActive: true,
-      isLocked: false,
-      lessons: [
-        { id: 1, title: 'Вступ до курсу', isCompleted: true },
-        { id: 2, title: 'Основи мислення продюсера', isCompleted: true },
-        { id: 3, title: 'Планування цілей', isCompleted: true },
-        { id: 4, title: 'Управління часом', isCompleted: true },
-        { id: 5, title: 'Фінансова грамотність', isCompleted: true },
-        { id: 6, title: 'Практичне завдання', isCompleted: false },
-      ],
-    },
-    {
-      id: 1,
-      category: 'Модуль 1',
-      title: 'Формула запуска на мільйон',
-      lessonsCompleted: 5,
-      totalLessons: 7,
-      isActive: false,
-      isLocked: false,
-      lessons: [
-        { id: 1, title: 'Хто такий продюсер і що він робить', isCompleted: false },
-        { id: 2, title: 'Системи та види запусків', isCompleted: true },
-        { id: 3, title: 'Схема запуску. Від ідеї до першого мільйона', isCompleted: true },
-        { id: 4, title: 'Вибір прибуткової ніші для запуску', isCompleted: true },
-        { id: 5, title: 'Типи інфопродуктів', isCompleted: true },
-        { id: 6, title: 'Декомпозиція запуску. Як досягти мети', isCompleted: false },
-        { id: 7, title: 'Види воронок продажів на запусках: через сторіс, через безкоштовник, через анкету', isCompleted: false },
-      ],
-    },
-    {
-      id: 2,
-      category: 'Модуль 2',
-      title: 'Вибір ідеального експерта для запуску',
-      lessonsCompleted: 0,
-      totalLessons: 7,
-      isActive: false,
-      isLocked: false,
-      lessons: [],
-    },
-    {
-      id: 3,
-      category: 'Модуль 3',
-      title: 'Продукт, що сам себе продає',
-      lessonsCompleted: 0,
-      totalLessons: 7,
-      isActive: false,
-      isLocked: true,
-      unlockDate: '24 грудня',
-      lessons: [],
-    },
-  ];
+export default function ModulesPage() {
+  const [expandedModuleId, setExpandedModuleId] = useState<string | null>(null);
+  const [modules, setModules] = useState<Module[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const toggleModule = (moduleId: number) => {
+  useEffect(() => {
+    loadModules();
+  }, []);
+
+  const loadModules = async () => {
+    try {
+      const data = await modulesService.getModules();
+      const transformedModules = data.map((apiModule: ApiModule) => {
+        const completedLessons = apiModule.lessons.filter(l => l.isCompleted).length;
+        return {
+          id: apiModule._id,
+          category: `Модуль ${apiModule.number}`,
+          title: apiModule.title,
+          lessonsCompleted: completedLessons,
+          totalLessons: apiModule.lessons.length,
+          isActive: apiModule.number === 1 && !apiModule.isLocked, // First unlocked module is active
+          isLocked: apiModule.isLocked,
+          unlockDate: apiModule.unlockDate ? new Date(apiModule.unlockDate).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' }) : undefined,
+          lessons: apiModule.lessons.map(lesson => ({
+            id: lesson.number,
+            title: lesson.title,
+            isCompleted: lesson.isCompleted,
+          })),
+        };
+      });
+      setModules(transformedModules);
+    } catch (error) {
+      console.error('Failed to load modules:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const totalModules = modules.length;
+  const completedModules = modules.filter(m => m.lessonsCompleted === m.totalLessons && m.totalLessons > 0).length;
+
+  const toggleModule = (moduleId: string) => {
     setExpandedModuleId(expandedModuleId === moduleId ? null : moduleId);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F2F2F2] max-w-md mx-auto flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2466FF] mx-auto mb-4"></div>
+          <p className="text-gray-600">Завантаження...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F2F2F2] max-w-md mx-auto">
@@ -150,15 +137,29 @@ export default function ProgressPage() {
   );
 }
 
+interface ModuleCardProps {
+  module: Module;
+  isExpanded: boolean;
+  onToggle: () => void;
+}
+
 function ModuleCard({ 
   module, 
   isExpanded,
   onToggle 
-}: { 
-  module: Module;
-  isExpanded: boolean;
-  onToggle: () => void;
-}) {
+}: ModuleCardProps) {
+  const handleArrowClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onToggle();
+  };
+
+  const handleModuleClick = () => {
+    if (!module.isLocked) {
+      window.location.href = `/modules/${module.id}`;
+    }
+  };
+
   return (
     <div
       className={`rounded-2xl overflow-hidden ${
@@ -166,12 +167,12 @@ function ModuleCard({
           ? 'bg-gradient-to-br from-[#1792FE] to-[#2466FF]'
           : module.isLocked
           ? 'bg-white/50 backdrop-blur-sm'
-          : 'bg-white'
+          : 'bg-white backdrop-blur-sm'
       }`}
     >
       <div 
-        className="p-3 cursor-pointer"
-        onClick={module.isLocked ? undefined : onToggle}
+        className="p-3 cursor-pointer hover:opacity-90 transition-opacity"
+        onClick={handleModuleClick}
       >
         <div className="space-y-3">
           {/* Header */}
@@ -210,10 +211,17 @@ function ModuleCard({
               <div className="w-6 h-6 flex items-center justify-center">
                 <Lock className="w-5 h-5 text-gray-400" />
               </div>
-            ) : isExpanded ? (
-              <ChevronUp className={`w-5 h-5 ${module.isActive ? 'text-white' : 'text-gray-400'}`} />
             ) : (
-              <ChevronDown className={`w-5 h-5 ${module.isActive ? 'text-white' : 'text-gray-400'}`} />
+              <button
+                onClick={handleArrowClick}
+                className="p-1 hover:bg-black/10 rounded-full transition-colors"
+              >
+                {isExpanded ? (
+                  <ChevronUp className={`w-5 h-5 ${module.isActive ? 'text-white' : 'text-gray-900'}`} />
+                ) : (
+                  <ChevronDown className={`w-5 h-5 ${module.isActive ? 'text-white' : 'text-gray-900'}`} />
+                )}
+              </button>
             )}
           </div>
 
@@ -222,7 +230,7 @@ function ModuleCard({
             className={`inline-flex items-center px-2 py-1.5 rounded-full text-xs font-bold ${
               module.isActive
                 ? 'bg-[#5BB3FE] text-white'
-                : 'bg-[#F2F2F2] text-gray-500'
+                : 'bg-[#F2F2F2] text-[#7F7F7F]'
             }`}
           >
             {module.lessonsCompleted}/{module.totalLessons} уроків пройдено
