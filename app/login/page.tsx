@@ -30,9 +30,32 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Помилка при вході');
+      }
+
+      const data = await response.json();
+      
+      // Зберігаємо токен
+      localStorage.setItem('token', data.token);
+      
+      // Викликаємо login з контексту для оновлення стану
       await login(formData.email, formData.password);
-      // Успішний вхід - перенаправлення на головну
-      router.push('/home');
+      
+      // Перенаправляємо залежно від ролі
+      if (data.isAdmin) {
+        console.log('🔐 Admin logged in, redirecting to admin panel');
+        router.push('/admin');
+      } else {
+        router.push('/home');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Помилка при вході');
     } finally {
