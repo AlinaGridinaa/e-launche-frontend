@@ -53,6 +53,9 @@ export default function LoginPage() {
       if (data.isAdmin) {
         console.log('🔐 Admin logged in, redirecting to admin panel');
         router.push('/admin');
+      } else if (data.isCurator) {
+        console.log('📚 Curator logged in, redirecting to curator panel');
+        router.push('/curator');
       } else {
         router.push('/home');
       }

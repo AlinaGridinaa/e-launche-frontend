@@ -27,6 +27,14 @@ export interface ProfileStats {
   rank: number;
 }
 
+export interface Achievement {
+  _id?: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  awardedAt: Date;
+}
+
 export interface ProfileResponse {
   user: UserProfile;
   stats: ProfileStats;
@@ -98,5 +106,25 @@ export const profileService = {
     }
 
     return response.json();
+  },
+
+  async getMyAchievements(): Promise<Achievement[]> {
+    const token = localStorage.getItem('token');
+    if (!token) return [];
+
+    // Декодуємо JWT щоб отримати userId
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const userId = payload.sub;
+
+    const response = await fetch(`${API_URL}/admin/users/${userId}/achievements`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch achievements');
+    }
+
+    const data = await response.json();
+    return data.achievements || [];
   },
 };

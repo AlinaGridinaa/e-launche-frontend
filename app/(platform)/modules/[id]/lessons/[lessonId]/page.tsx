@@ -1,11 +1,12 @@
 'use client';
 
-import { X, Heart, Download, ChevronDown, Play } from 'lucide-react';
+import { X, Heart, Download, ChevronDown, Play, FileText, Upload, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { modulesService } from '@/lib/services/modules.service';
 import { favoritesService } from '@/lib/services/favorites.service';
 import { progressService } from '@/lib/services/progress.service';
+import { homeworkService, Homework } from '@/lib/services/homework.service';
 
 // Helper function to extract YouTube video ID
 const getYouTubeVideoId = (url: string) => {
@@ -31,12 +32,20 @@ const getYouTubeVideoId = (url: string) => {
 export default function LessonPage() {
   const params = useParams();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'info' | 'materials'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'materials' | 'homework'>('info');
   const [lessonData, setLessonData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isCompleted, setIsCompleted] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  
+  // Homework states
+  const [homework, setHomework] = useState<Homework | null>(null);
+  const [homeworkAnswer, setHomeworkAnswer] = useState('');
+  const [homeworkAttachments, setHomeworkAttachments] = useState<string[]>([]);
+  const [attachmentInput, setAttachmentInput] = useState('');
+  const [homeworkLoading, setHomeworkLoading] = useState(false);
+  const [homeworkSubmitted, setHomeworkSubmitted] = useState(false);
 
   const moduleId = params.id as string;
   const lessonNumber = parseInt(params.lessonId as string);
@@ -44,6 +53,7 @@ export default function LessonPage() {
   useEffect(() => {
     loadLesson();
     checkFavoriteStatus();
+    loadHomework();
   }, [moduleId, lessonNumber]);
 
   const loadLesson = async () => {
@@ -62,6 +72,7 @@ export default function LessonPage() {
           description: lesson.description || 'Опис відео буде доступний незабаром',
           videoUrl: lesson.videoUrl,
           materials: lesson.materials,
+          homework: lesson.homework || '',
           presentation: presentationMaterial ? {
             title: presentationMaterial.title || 'Завантажити презентацію до уроку',
             url: presentationMaterial.url,
@@ -91,6 +102,57 @@ export default function LessonPage() {
     } catch (error) {
       console.error('Failed to check favorite status:', error);
     }
+  };
+
+  const loadHomework = async () => {
+    try {
+      const hw = await homeworkService.getMyHomework(moduleId, lessonNumber);
+      if (hw) {
+        setHomework(hw);
+        setHomeworkAnswer(hw.answer);
+        setHomeworkAttachments(hw.attachments);
+        setHomeworkSubmitted(true);
+      }
+    } catch (error) {
+      console.error('Failed to load homework:', error);
+    }
+  };
+
+  const handleSubmitHomework = async () => {
+    if (!homeworkAnswer.trim()) {
+      alert('Будь ласка, введіть відповідь');
+      return;
+    }
+
+    try {
+      setHomeworkLoading(true);
+      const result = await homeworkService.submitHomework({
+        moduleId,
+        lessonNumber,
+        answer: homeworkAnswer,
+        attachments: homeworkAttachments,
+      });
+      
+      setHomework(result);
+      setHomeworkSubmitted(true);
+      alert('Домашнє завдання успішно відправлено! ✅');
+    } catch (error: any) {
+      console.error('Failed to submit homework:', error);
+      alert(error.response?.data?.message || 'Помилка відправки домашнього завдання');
+    } finally {
+      setHomeworkLoading(false);
+    }
+  };
+
+  const handleAddAttachment = () => {
+    if (attachmentInput.trim()) {
+      setHomeworkAttachments([...homeworkAttachments, attachmentInput.trim()]);
+      setAttachmentInput('');
+    }
+  };
+
+  const handleRemoveAttachment = (index: number) => {
+    setHomeworkAttachments(homeworkAttachments.filter((_, i) => i !== index));
   };
 
   const handleMarkAsCompleted = async () => {
@@ -244,10 +306,10 @@ export default function LessonPage() {
         </div>
 
         {/* Tabs */}
-        <div className="px-4 pt-4 flex items-center gap-2">
+        <div className="px-4 pt-4 flex items-center gap-2 overflow-x-auto">
           <button
             onClick={() => setActiveTab('info')}
-            className={`px-3 py-2 rounded-2xl text-sm font-medium transition-colors ${
+            className={`px-3 py-2 rounded-2xl text-sm font-medium transition-colors whitespace-nowrap ${
               activeTab === 'info'
                 ? 'bg-black text-white'
                 : 'bg-white text-black'
@@ -257,7 +319,7 @@ export default function LessonPage() {
           </button>
           <button
             onClick={() => setActiveTab('materials')}
-            className={`px-3 py-2 rounded-2xl text-sm font-medium transition-colors ${
+            className={`px-3 py-2 rounded-2xl text-sm font-medium transition-colors whitespace-nowrap ${
               activeTab === 'materials'
                 ? 'bg-black text-white'
                 : 'bg-white text-black'
@@ -265,6 +327,18 @@ export default function LessonPage() {
           >
             Матеріали уроку
           </button>
+          {lessonData?.homework && (
+            <button
+              onClick={() => setActiveTab('homework')}
+              className={`px-3 py-2 rounded-2xl text-sm font-medium transition-colors whitespace-nowrap ${
+                activeTab === 'homework'
+                  ? 'bg-black text-white'
+                  : 'bg-white text-black'
+              }`}
+            >
+              Домашнє завдання
+            </button>
+          )}
         </div>
 
         {/* Content */}
@@ -419,7 +493,7 @@ export default function LessonPage() {
                 )}
               </div>
             </>
-          ) : (
+          ) : activeTab === 'materials' ? (
             /* Materials Tab */
             <div className="bg-white rounded-2xl p-3">
               <h3 className="text-base font-bold text-black mb-3">
@@ -488,6 +562,169 @@ export default function LessonPage() {
                   <p className="text-sm text-gray-500">Додаткові матеріали відсутні</p>
                   <p className="text-xs text-gray-400 mt-1">Перегляньте відео для отримання інформації</p>
                 </div>
+              )}
+            </div>
+          ) : (
+            /* Homework Tab */
+            <div className="bg-white rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <FileText className="w-5 h-5 text-[#2466FF]" />
+                <h3 className="text-base font-bold text-black">
+                  Домашнє завдання
+                </h3>
+              </div>
+
+              {/* Homework Task */}
+              <div className="bg-[#F2F2F2] rounded-xl p-4 mb-4">
+                <p className="text-sm text-black leading-relaxed whitespace-pre-wrap">
+                  {lessonData.homework}
+                </p>
+              </div>
+
+              {/* Submission Status */}
+              {homework && (
+                <div className={`rounded-xl p-3 mb-4 flex items-center gap-3 ${
+                  homework.status === 'approved' ? 'bg-green-50' :
+                  homework.status === 'reviewed' ? 'bg-blue-50' :
+                  homework.status === 'needs_revision' ? 'bg-orange-50' :
+                  'bg-yellow-50'
+                }`}>
+                  {homework.status === 'approved' ? (
+                    <>
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-green-800">Затверджено куратором</p>
+                        {homework.score !== undefined && (
+                          <p className="text-xs text-green-600 mt-0.5">Оцінка: {homework.score}/100</p>
+                        )}
+                      </div>
+                    </>
+                  ) : homework.status === 'reviewed' ? (
+                    <>
+                      <CheckCircle className="w-5 h-5 text-blue-600" />
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-blue-800">Перевірено куратором</p>
+                        {homework.score !== undefined && (
+                          <p className="text-xs text-blue-600 mt-0.5">Оцінка: {homework.score}/100</p>
+                        )}
+                      </div>
+                    </>
+                  ) : homework.status === 'needs_revision' ? (
+                    <>
+                      <AlertCircle className="w-5 h-5 text-orange-600" />
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-orange-800">Потрібна доопрацювання</p>
+                        <p className="text-xs text-orange-600 mt-0.5">Перегляньте коментар куратора та оновіть відповідь</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <Clock className="w-5 h-5 text-yellow-600" />
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-yellow-800">На перевірці</p>
+                        <p className="text-xs text-yellow-600 mt-0.5">Очікується відповідь куратора</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Feedback from curator */}
+              {homework?.feedback && (
+                <div className="bg-[#E9F0FF] rounded-xl p-3 mb-4">
+                  <p className="text-xs font-bold text-[#2466FF] mb-1">Відгук куратора:</p>
+                  <p className="text-sm text-black leading-relaxed">{homework.feedback}</p>
+                </div>
+              )}
+
+              {/* Answer Input */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-black mb-2">
+                  Ваша відповідь <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={homeworkAnswer}
+                  onChange={(e) => setHomeworkAnswer(e.target.value)}
+                  placeholder="Напишіть вашу відповідь тут..."
+                  rows={6}
+                  disabled={homework?.status === 'approved'}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black resize-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+                />
+              </div>
+
+              {/* Attachments Section */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-black mb-2">
+                  Прикріплені файли (посилання)
+                </label>
+                
+                {/* Existing attachments */}
+                {homeworkAttachments.length > 0 && (
+                  <div className="space-y-2 mb-3">
+                    {homeworkAttachments.map((attachment, index) => (
+                      <div key={index} className="flex items-center gap-2 bg-[#F2F2F2] rounded-lg p-2">
+                        <a 
+                          href={attachment}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 text-sm text-[#2466FF] hover:underline truncate"
+                        >
+                          {attachment}
+                        </a>
+                        {homework?.status !== 'approved' && (
+                          <button
+                            onClick={() => handleRemoveAttachment(index)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add attachment input */}
+                {homework?.status !== 'approved' && (
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      value={attachmentInput}
+                      onChange={(e) => setAttachmentInput(e.target.value)}
+                      placeholder="https://drive.google.com/..."
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-sm"
+                    />
+                    <button
+                      onClick={handleAddAttachment}
+                      disabled={!attachmentInput.trim()}
+                      className="px-4 py-2 bg-[#F2F2F2] rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Upload className="w-4 h-4 text-black" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Submit Button */}
+              {homework?.status !== 'approved' && (
+                <button
+                  onClick={handleSubmitHomework}
+                  disabled={homeworkLoading || !homeworkAnswer.trim()}
+                  className={`w-full px-4 py-3 font-medium rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                    homework?.status === 'needs_revision'
+                      ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                      : 'bg-[#2466FF] hover:bg-[#1557ee] text-white'
+                  }`}
+                >
+                  {homeworkLoading ? 'Відправка...' : homework?.status === 'needs_revision' ? 'Відправити виправлену версію' : homeworkSubmitted ? 'Оновити відповідь' : 'Відправити на перевірку'}
+                </button>
+              )}
+
+              {/* Submission info */}
+              {homework?.submittedAt && (
+                <p className="text-xs text-gray-500 text-center mt-3">
+                  Відправлено: {new Date(homework.submittedAt).toLocaleString('uk-UA')}
+                </p>
               )}
             </div>
           )}

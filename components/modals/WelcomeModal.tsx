@@ -67,11 +67,11 @@ export default function WelcomeModal({ isOpen, faculty, onClose }: WelcomeModalP
   };
 
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) {
       setIsVisible(true);
       setTimeout(() => setIsAnimating(true), 50);
     }
-  }, [isOpen]);
+  }, [!isOpen]);
 
   const handleClose = () => {
     setIsAnimating(false);
@@ -122,7 +122,7 @@ export default function WelcomeModal({ isOpen, faculty, onClose }: WelcomeModalP
         {/* Card shell */}
         <div className="rounded-3xl border border-[#E7E7E7] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.08)] overflow-hidden">
           {/* Header (простий, без синього фону і шапки) */}
-          <div className="px-6 pt-6 pb-4 bg-white">
+          <div className="px-6 pt-6 pb-4 bg-white flex justify-center">
             <h1 className="text-[20px] font-bold text-black tracking-tight">Вітаємо в Академії!</h1>
           </div>
 
@@ -154,7 +154,7 @@ export default function WelcomeModal({ isOpen, faculty, onClose }: WelcomeModalP
 
           {/* Body */}
           <div className="px-6 py-6">
-            <p className="text-[14px] text-gray-700">
+            <p className="text-[14px] text-gray-700 text-center">
               Інститут Хогвортса уважно вивчив вашу анкету студента…
             </p>
 
@@ -172,12 +172,7 @@ export default function WelcomeModal({ isOpen, faculty, onClose }: WelcomeModalP
                 <p className="text-[14px] font-medium text-gray-800"> Шляпа Розподілу обрала для вас факультет</p>
               </div>
 
-              {/* Пояснення під знаком питання */}
-              {!revealed && (
-                <p className="mt-2 text-[12px] text-gray-500 leading-relaxed">
-                  Натисніть кнопку нижче, щоб відкрити свій факультет. Маленька таємниця — велике відкриття ✨
-                </p>
-              )}
+              
 
               {/* Кнопка із знаком питання або відкритий факультет */}
               {!revealed ? (
@@ -198,6 +193,12 @@ export default function WelcomeModal({ isOpen, faculty, onClose }: WelcomeModalP
                 <div className="mt-3 inline-flex items-center justify-center mx-auto gap-2 px-6 py-2.5 rounded-2xl bg-[#E9F0FF] shadow-sm">
                   <span className="text-[18px] font-bold text-[#2466FF] tracking-tight">{faculty}</span>
                 </div>
+              )}
+              {/* Пояснення під знаком питання */}
+              {!revealed && (
+                <p className="mt-2 text-[12px] text-gray-500 leading-relaxed">
+                  Натисніть кнопку нижче, щоб відкрити свій факультет.
+                </p>
               )}
             </div>
 

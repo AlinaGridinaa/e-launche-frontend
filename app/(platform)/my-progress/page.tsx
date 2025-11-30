@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronDown, MoreHorizontal, X, Plus, Camera } from 'lucide-react';
+import { ChevronDown, MoreHorizontal, X, Plus, Camera, Lock } from 'lucide-react';
 import Image from 'next/image';
-import { profileService, UserProfile, ProfileStats } from '@/lib/services/profile.service';
+import { profileService, UserProfile, ProfileStats, Achievement } from '@/lib/services/profile.service';
 
 interface LeaderboardEntry {
   rank: number;
@@ -19,6 +19,7 @@ export default function MyProgressPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<ProfileStats | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -27,6 +28,7 @@ export default function MyProgressPage() {
   useEffect(() => {
     loadProfile();
     loadLeaderboard();
+    loadAchievements();
   }, []);
 
   const loadProfile = async () => {
@@ -48,6 +50,15 @@ export default function MyProgressPage() {
       setLeaderboard(data);
     } catch (error) {
       console.error('Failed to load leaderboard:', error);
+    }
+  };
+
+  const loadAchievements = async () => {
+    try {
+      const data = await profileService.getMyAchievements();
+      setAchievements(data);
+    } catch (error) {
+      console.error('Failed to load achievements:', error);
     }
   };
 
@@ -300,16 +311,18 @@ export default function MyProgressPage() {
         </div>
       </div>
 
-      {/* Лідерборд */}
+      {/* Контент табів */}
       <div className="px-4 mt-4 mb-32">
-        {leaderboard.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-sm text-gray-500">Рейтинг порожній</p>
-            <p className="text-xs text-gray-400 mt-1">Додайте дохід, щоб з'явитися в рейтингу</p>
-          </div>
-        ) : (
-          <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
-            {leaderboard.map((user, index) => {
+        {activeTab === 'rating' ? (
+          // Лідерборд
+          leaderboard.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-sm text-gray-500">Рейтинг порожній</p>
+              <p className="text-xs text-gray-400 mt-1">Додайте дохід, щоб з'явитися в рейтингу</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
+              {leaderboard.map((user, index) => {
               const isTop3 = user.rank <= 3;
               const getRankEmoji = () => {
                 if (user.rank === 1) return '🥇';
@@ -365,6 +378,55 @@ export default function MyProgressPage() {
                 </div>
               );
             })}
+          </div>
+          )
+        ) : (
+          // Нагороди
+          <div className="flex flex-wrap gap-3">
+            {achievements.map((achievement) => (
+              <div
+                key={achievement._id}
+                className="w-[105px] h-[124px] bg-white rounded-2xl p-3 shadow-sm backdrop-blur-sm relative"
+              >
+                <div className="flex flex-col items-center justify-between h-full">
+                  {/* Іконка/Емоджі */}
+                  <div className="w-[73px] h-[60px] flex items-center justify-center">
+                    <img 
+                      src={achievement.imageUrl} 
+                      alt={achievement.title}
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://via.placeholder.com/60?text=🏆';
+                      }}
+                    />
+                  </div>
+
+                  {/* Назва */}
+                  <p className="text-xs font-bold text-black text-center leading-4 w-full">
+                    {achievement.title}
+                  </p>
+                </div>
+
+                {/* Дата */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <div className="px-2 py-1.5 bg-[#E9F0FF] rounded-[41px] whitespace-nowrap">
+                    <span className="text-xs font-bold text-[#2466FF]">
+                      {new Date(achievement.awardedAt).toLocaleDateString('uk-UA', { 
+                        day: 'numeric', 
+                        month: 'short' 
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {achievements.length === 0 && (
+              <div className="w-full text-center py-12">
+                <p className="text-sm text-gray-500">Нагород поки немає</p>
+                <p className="text-xs text-gray-400 mt-1">Виконуйте завдання щоб отримати нагороди</p>
+              </div>
+            )}
           </div>
         )}
       </div>

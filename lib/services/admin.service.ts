@@ -9,6 +9,14 @@ const getAuthHeaders = () => {
   };
 };
 
+export interface Achievement {
+  _id?: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  awardedAt: Date;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -17,9 +25,18 @@ export interface User {
   phone?: string;
   faculty?: string;
   isAdmin: boolean;
+  isCurator?: boolean;
+  curatorId?: string;
   earnings: number;
   completedLessonsCount: number;
   completedModulesCount: number;
+  achievements?: Achievement[];
+}
+
+export interface Curator {
+  id: string;
+  name: string;
+  email: string;
 }
 
 export const adminService = {
@@ -43,6 +60,86 @@ export const adminService = {
     const response = await axios.put(
       `${API_URL}/admin/users/${userId}/admin`,
       {},
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  },
+
+  async createUser(userData: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    phone?: string;
+    faculty?: string;
+    isAdmin?: boolean;
+  }): Promise<User> {
+    const response = await axios.post(
+      `${API_URL}/admin/users`,
+      userData,
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  },
+
+  async awardAchievement(
+    userId: string,
+    achievement: {
+      title: string;
+      description: string;
+      imageUrl: string;
+    }
+  ): Promise<{ id: string; firstName: string; lastName: string; achievements: Achievement[] }> {
+    const response = await axios.post(
+      `${API_URL}/admin/users/${userId}/achievements`,
+      achievement,
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  },
+
+  async getUserAchievements(userId: string): Promise<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    achievements: Achievement[];
+  }> {
+    const response = await axios.get(
+      `${API_URL}/admin/users/${userId}/achievements`,
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  },
+
+  async removeAchievement(userId: string, achievementId: string): Promise<{ id: string; achievements: Achievement[] }> {
+    const response = await axios.delete(
+      `${API_URL}/admin/users/${userId}/achievements/${achievementId}`,
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  },
+
+  async toggleCurator(userId: string): Promise<{ id: string; email: string; isCurator: boolean }> {
+    const response = await axios.put(
+      `${API_URL}/admin/users/${userId}/curator-toggle`,
+      {},
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  },
+
+  async assignCurator(userId: string, curatorId: string): Promise<{ id: string; curatorId: string; curatorName: string }> {
+    const response = await axios.put(
+      `${API_URL}/admin/users/${userId}/assign-curator`,
+      { curatorId },
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  },
+
+  async getAllCurators(): Promise<Curator[]> {
+    const response = await axios.get(
+      `${API_URL}/admin/curators`,
       { headers: getAuthHeaders() }
     );
     return response.data;
