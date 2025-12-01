@@ -22,7 +22,7 @@ export function WeeklySchedule() {
           {/* Content */}
           <div className="flex-1 flex items-center">
             <h2 className="text-xl font-bold text-gray-900">
-              РОЗКЛАДУ<br />НА ТИЖДЕНЬ
+              РОЗКЛАД<br />НА ТИЖДЕНЬ
             </h2>
           </div>
         </div>
