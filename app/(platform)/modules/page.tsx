@@ -49,9 +49,11 @@ export default function ModulesPage() {
     try {
       console.log('📚 Loading modules...');
       const data = await modulesService.getModules();
+      console.log('📦 Raw API data:', data);
       const transformedModules = data.map((apiModule: ApiModule) => {
         const completedLessons = apiModule.lessons.filter(l => l.isCompleted).length;
         console.log(`📖 Module ${apiModule.number}: ${completedLessons}/${apiModule.lessons.length} lessons completed`);
+        console.log(`📝 Module ${apiModule.number} lessons:`, apiModule.lessons);
         return {
           id: apiModule._id,
           category: `Модуль ${apiModule.number}`,
@@ -63,7 +65,7 @@ export default function ModulesPage() {
           unlockDate: apiModule.unlockDate ? new Date(apiModule.unlockDate).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' }) : undefined,
           lessons: apiModule.lessons.map(lesson => ({
             id: lesson.number,
-            title: lesson.title,
+            title: lesson.title || `Урок ${lesson.number}`,
             isCompleted: lesson.isCompleted || false,
           })),
         };
@@ -260,7 +262,7 @@ function ModuleCard({
         <div className="bg-white">
           {module.lessons.map((lesson, index) => (
             <div
-              key={lesson.id}
+              key={`${module.id}-lesson-${lesson.id}`}
               className={`flex items-center gap-3 px-3 py-3 ${
                 index !== module.lessons.length - 1 ? 'border-b border-gray-200' : ''
               }`}
