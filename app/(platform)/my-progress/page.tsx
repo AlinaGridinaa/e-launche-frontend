@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronDown, MoreHorizontal, X, Plus, Camera, Lock } from 'lucide-react';
 import Image from 'next/image';
-import { profileService, UserProfile, ProfileStats, Achievement } from '@/lib/services/profile.service';
+import { profileService, UserProfile, ProfileStats } from '@/lib/services/profile.service';
+import { achievementsService, UserAchievement } from '@/lib/services/achievements.service';
 
 interface LeaderboardEntry {
   rank: number;
@@ -19,7 +20,7 @@ export default function MyProgressPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<ProfileStats | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [userAchievements, setUserAchievements] = useState<UserAchievement[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -28,7 +29,7 @@ export default function MyProgressPage() {
   useEffect(() => {
     loadProfile();
     loadLeaderboard();
-    loadAchievements();
+    loadUserAchievements();
   }, []);
 
   const loadProfile = async () => {
@@ -53,12 +54,12 @@ export default function MyProgressPage() {
     }
   };
 
-  const loadAchievements = async () => {
+  const loadUserAchievements = async () => {
     try {
-      const data = await profileService.getMyAchievements();
-      setAchievements(data);
+      const data = await achievementsService.getMyAchievements();
+      setUserAchievements(data);
     } catch (error) {
-      console.error('Failed to load achievements:', error);
+      console.error('Failed to load user achievements:', error);
     }
   };
 
@@ -176,13 +177,7 @@ export default function MyProgressPage() {
               <span className="text-xs font-medium text-white">Додати дохід</span>
             </button>
             
-            <button 
-              onClick={() => router.push('/achievements')}
-              className="flex items-center gap-1 px-4 py-2.5 bg-black/20 backdrop-blur-md rounded-[13px] hover:bg-black/30 transition-colors"
-            >
-              <span className="text-sm">🏆</span>
-              <span className="text-xs font-medium text-white">Нагороди</span>
-            </button>
+           
           </div>
         </div>
       </div>
@@ -392,47 +387,73 @@ export default function MyProgressPage() {
           )
         ) : (
           // Нагороди
-          <div className="flex flex-wrap gap-3">
-            {achievements.map((achievement) => (
-              <div
-                key={achievement._id}
-                className="w-[105px] h-[124px] bg-white rounded-2xl p-3 shadow-sm backdrop-blur-sm relative"
-              >
-                <div className="flex flex-col items-center justify-between h-full">
-                  {/* Іконка/Емоджі */}
-                  <div className="w-[73px] h-[60px] flex items-center justify-center">
-                    <img 
-                      src={achievement.imageUrl} 
-                      alt={achievement.title}
-                      className="w-full h-full object-contain"
-                      onError={(e) => {
-                        e.currentTarget.src = 'https://via.placeholder.com/60?text=🏆';
-                      }}
-                    />
+          <div className="grid grid-cols-3 gap-3">
+            {/* Сортуємо: спочатку отримані (за датою), потім неотримані */}
+            {userAchievements
+              .sort((a, b) => {
+                // Спочатку отримані, потім неотримані
+                if (a.isUnlocked && !b.isUnlocked) return -1;
+                if (!a.isUnlocked && b.isUnlocked) return 1;
+                
+                // Серед отриманих сортуємо за датою (нові зверху)
+                if (a.isUnlocked && b.isUnlocked) {
+                  const dateA = a.approvedAt ? new Date(a.approvedAt).getTime() : 0;
+                  const dateB = b.approvedAt ? new Date(b.approvedAt).getTime() : 0;
+                  return dateB - dateA;
+                }
+                
+                // Серед неотриманих залишаємо початковий порядок
+                return 0;
+              })
+              .map((achievement) => (
+                <button
+                  key={achievement.id}
+                  onClick={() => router.push('/achievements')}
+                  className={`bg-white rounded-2xl p-3 shadow-sm relative ${
+                    achievement.isUnlocked ? '' : 'opacity-60'
+                  }`}
+                >
+                  {/* Lock icon для незаблокованих */}
+                  {!achievement.isUnlocked && !achievement.isPending && (
+                    <div className="absolute top-2 right-2 w-5 h-5 bg-gray-200 rounded-full flex items-center justify-center">
+                      <Lock className="w-3 h-3 text-gray-500" />
+                    </div>
+                  )}
+
+                  {/* Pending badge */}
+                  {achievement.isPending && (
+                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-yellow-100 rounded-full whitespace-nowrap">
+                      <span className="text-[10px] text-yellow-700 font-medium">На розгляді</span>
+                    </div>
+                  )}
+
+                  {/* Дата отримання */}
+                  {achievement.isUnlocked && achievement.approvedAt && (
+                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-[#E9F0FF] rounded-full whitespace-nowrap">
+                      <span className="text-[10px] font-bold text-[#2466FF]">
+                        {new Date(achievement.approvedAt).toLocaleDateString('uk-UA', { 
+                          day: 'numeric', 
+                          month: 'short' 
+                        })}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Емоджі */}
+                  <div className="text-4xl text-center mb-2">
+                    {achievement.emoji}
                   </div>
 
                   {/* Назва */}
-                  <p className="text-xs font-bold text-black text-center leading-4 w-full">
+                  <p className="text-[10px] font-bold text-black text-center leading-tight">
                     {achievement.title}
                   </p>
-                </div>
+                </button>
+              ))
+            }
 
-                {/* Дата */}
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <div className="px-2 py-1.5 bg-[#E9F0FF] rounded-[41px] whitespace-nowrap">
-                    <span className="text-xs font-bold text-[#2466FF]">
-                      {new Date(achievement.awardedAt).toLocaleDateString('uk-UA', { 
-                        day: 'numeric', 
-                        month: 'short' 
-                      })}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {achievements.length === 0 && (
-              <div className="w-full text-center py-12">
+            {userAchievements.length === 0 && (
+              <div className="col-span-3 text-center py-12">
                 <p className="text-sm text-gray-500">Нагород поки немає</p>
                 <p className="text-xs text-gray-400 mt-1">Виконуйте завдання щоб отримати нагороди</p>
               </div>

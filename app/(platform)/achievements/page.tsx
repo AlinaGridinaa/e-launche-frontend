@@ -164,7 +164,7 @@ export default function AchievementsPage() {
       {/* Achievement Detail Modal */}
       {selectedAchievement && !showSubmitModal && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-white rounded-t-3xl shadow-2xl p-6 animate-in slide-in-from-bottom duration-300">
+          <div className="w-full max-w-md bg-white rounded-t-3xl shadow-2xl p-6 animate-in slide-in-from-bottom duration-300 min-h-[50vh] pb-24 relative">
             {/* Close button */}
             <button
               onClick={() => setSelectedAchievement(null)}
@@ -241,8 +241,8 @@ export default function AchievementsPage() {
 
       {/* Submit Modal */}
       {showSubmitModal && selectedAchievement && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-white rounded-t-3xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm ">
+          <div className="w-full max-w-md bg-white rounded-t-3xl shadow-2xl p-6 max-h-[90vh] min-h-[80vh] overflow-y-autop pb-24">
             {/* Close button */}
             <button
               onClick={() => setShowSubmitModal(false)}
