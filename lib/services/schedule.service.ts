@@ -93,4 +93,69 @@ export const scheduleService = {
     const result = await response.json();
     return result.data;
   },
+
+  // Admin methods
+  async createEvent(eventData: Partial<ScheduleEvent>): Promise<ScheduleEvent> {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/admin/schedule`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(eventData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw error;
+    }
+
+    const result = await response.json();
+    return result.data;
+  },
+
+  async updateEvent(id: string, eventData: Partial<ScheduleEvent>): Promise<ScheduleEvent> {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/admin/schedule/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(eventData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw error;
+    }
+
+    const result = await response.json();
+    return result.data;
+  },
+
+  async deleteEvent(id: string): Promise<void> {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/admin/schedule/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete event');
+    }
+  },
+
+  async deleteAllEvents(): Promise<void> {
+    const token = localStorage.getItem('token');
+    const events = await this.getAllEvents();
+    
+    // Видаляємо всі події по одній
+    for (const event of events) {
+      await this.deleteEvent(event._id);
+    }
+  },
 };
