@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Image, Save, Trash2, Plus, RefreshCw } from 'lucide-react';
 import { adminService } from '@/lib/services/admin.service';
+import { getAvatarUrl } from '@/lib/utils/avatar';
 
 interface AvatarLevel {
   _id: string;
@@ -341,7 +342,7 @@ export default function AvatarsManagementPage() {
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center">
                         <img
-                          src={avatar.imageUrl}
+                          src={getAvatarUrl(avatar.imageUrl)}
                           alt={`Level ${avatar.level}`}
                           className="w-full h-full object-cover"
                           onError={(e) => {

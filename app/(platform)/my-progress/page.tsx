@@ -6,6 +6,7 @@ import { ChevronDown, MoreHorizontal, X, Plus, Lock } from 'lucide-react';
 import Image from 'next/image';
 import { profileService, UserProfile, ProfileStats } from '@/lib/services/profile.service';
 import { achievementsService, UserAchievement } from '@/lib/services/achievements.service';
+import { getAvatarUrl } from '@/lib/utils/avatar';
 
 interface LeaderboardEntry {
   rank: number;
@@ -160,7 +161,7 @@ export default function MyProgressPage() {
               >
                 {profile.avatarUrl ? (
                   <img 
-                    src={profile.avatarUrl.startsWith('http') ? profile.avatarUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${profile.avatarUrl}`}
+                    src={getAvatarUrl(profile.avatarUrl)}
                     alt={`${profile.firstName} ${profile.lastName}`}
                     className="w-full h-full object-cover"
                   />
