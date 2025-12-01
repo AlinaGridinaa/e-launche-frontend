@@ -123,10 +123,7 @@ export function ScheduleModal({ isOpen, onClose }: ScheduleModalProps) {
             <X className="w-5 h-5" />
             <span className="font-medium">Закрыть</span>
           </button>
-          <div className="flex items-center gap-3 px-3 py-1.5 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm">
-            <ChevronDown className="w-5 h-5 text-white" />
-            <MoreHorizontal className="w-5 h-5 text-white" />
-          </div>
+         
         </div>
 
         {/* Modal Content */}
