@@ -139,12 +139,9 @@ export default function AddEarningsPage() {
               className="flex items-center gap-2 px-4 py-2 bg-black/10 backdrop-blur-md rounded-[32px]"
             >
               <X className="w-5 h-5 text-black" />
-              <span className="text-sm font-medium text-black">Закрить</span>
+              <span className="text-sm font-medium text-black">Закрити</span>
             </button>
-            <div className="flex items-center gap-3 px-4 py-2 bg-black/10 backdrop-blur-md rounded-[32px]">
-              <ChevronDown className="w-5 h-5 text-black" />
-              <MoreHorizontal className="w-5 h-5 text-black" />
-            </div>
+           
           </div>
 
           {/* Title */}
