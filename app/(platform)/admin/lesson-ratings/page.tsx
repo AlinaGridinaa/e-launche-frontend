@@ -15,16 +15,29 @@ interface LessonRating {
   completedAt: Date;
 }
 
+interface Module {
+  _id: string;
+  number: number;
+  title: string;
+  lessons: Array<{
+    number: number;
+    title: string;
+  }>;
+}
+
 const moodEmojis = ['😞', '😐', '🙂', '😀', '😄'];
 
 export default function LessonRatingsPage() {
   const router = useRouter();
   const [ratings, setRatings] = useState<LessonRating[]>([]);
+  const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterModule, setFilterModule] = useState<string>('all');
+  const [filterLesson, setFilterLesson] = useState<string>('all');
 
   useEffect(() => {
     loadRatings();
+    loadModules();
   }, []);
 
   const loadRatings = async () => {
@@ -50,11 +63,65 @@ export default function LessonRatingsPage() {
     }
   };
 
-  const filteredRatings = filterModule === 'all' 
-    ? ratings 
-    : ratings.filter(r => r.moduleId === filterModule);
+  const loadModules = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/modules`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-  const uniqueModules = Array.from(new Set(ratings.map(r => r.moduleId)));
+      if (response.ok) {
+        const data = await response.json();
+        setModules(data);
+      }
+    } catch (error) {
+      console.error('Failed to load modules:', error);
+    }
+  };
+
+  // Функція для отримання назви модуля
+  const getModuleName = (moduleId: string) => {
+    const module = modules.find(m => m._id === moduleId);
+    return module ? `Модуль ${module.number}: ${module.title}` : `Модуль ${moduleId}`;
+  };
+
+  // Функція для отримання назви уроку
+  const getLessonTitle = (moduleId: string, lessonNumber: number) => {
+    const module = modules.find(m => m._id === moduleId);
+    const lesson = module?.lessons.find(l => l.number === lessonNumber);
+    return lesson ? lesson.title : `Урок ${lessonNumber}`;
+  };
+
+  // Фільтрація за модулем і уроком
+  let filteredRatings = ratings;
+  
+  if (filterModule !== 'all') {
+    filteredRatings = filteredRatings.filter(r => r.moduleId === filterModule);
+  }
+  
+  if (filterLesson !== 'all') {
+    filteredRatings = filteredRatings.filter(r => r.lessonNumber === parseInt(filterLesson));
+  }
+
+  // Отримуємо унікальні модулі з рейтингів
+  const ratingsModules = Array.from(new Set(ratings.map(r => r.moduleId)))
+    .map(id => modules.find(m => m._id === id))
+    .filter(Boolean) as Module[];
+
+  // Отримуємо уроки з вибраного модуля або всі уроки
+  const availableLessons = filterModule === 'all'
+    ? Array.from(new Set(ratings.map(r => ({ moduleId: r.moduleId, lessonNumber: r.lessonNumber }))))
+    : ratings
+        .filter(r => r.moduleId === filterModule)
+        .map(r => ({ lessonNumber: r.lessonNumber }))
+        .filter((lesson, index, self) => 
+          index === self.findIndex(l => l.lessonNumber === lesson.lessonNumber)
+        );
 
   const averageMood = filteredRatings.length > 0
     ? (filteredRatings.reduce((sum, r) => sum + (r.moodRating || 0), 0) / filteredRatings.length).toFixed(1)
@@ -94,23 +161,55 @@ export default function LessonRatingsPage() {
           </div>
         </div>
 
-        {/* Filter */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Фільтр за модулем:
-          </label>
-          <select
-            value={filterModule}
-            onChange={(e) => setFilterModule(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
-          >
-            <option value="all">Всі модулі</option>
-            {uniqueModules.map((moduleId) => (
-              <option key={moduleId} value={moduleId}>
-                Модуль {moduleId}
-              </option>
-            ))}
-          </select>
+        {/* Filters */}
+        <div className="bg-white rounded-2xl p-4 shadow-sm mb-6 space-y-4">
+          {/* Module Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Фільтр за модулем:
+            </label>
+            <select
+              value={filterModule}
+              onChange={(e) => {
+                setFilterModule(e.target.value);
+                setFilterLesson('all'); // Скидаємо фільтр уроку при зміні модуля
+              }}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+            >
+              <option value="all">Всі модулі</option>
+              {ratingsModules.map((module) => (
+                <option key={module._id} value={module._id}>
+                  {getModuleName(module._id)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Lesson Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Фільтр за уроком:
+            </label>
+            <select
+              value={filterLesson}
+              onChange={(e) => setFilterLesson(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+              disabled={filterModule === 'all'}
+            >
+              <option value="all">Всі уроки</option>
+              {availableLessons.map((lesson, idx) => (
+                <option key={idx} value={lesson.lessonNumber}>
+                  Урок {lesson.lessonNumber}
+                  {filterModule !== 'all' && ` - ${getLessonTitle(filterModule, lesson.lessonNumber)}`}
+                </option>
+              ))}
+            </select>
+            {filterModule === 'all' && (
+              <p className="text-xs text-gray-500 mt-2">
+                Виберіть модуль щоб фільтрувати за уроками
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Ratings List */}
@@ -134,10 +233,13 @@ export default function LessonRatingsPage() {
                     <div className="flex-1">
                       <p className="font-bold text-black">{rating.userName}</p>
                       <p className="text-sm text-gray-600">{rating.userEmail}</p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Модуль {rating.moduleId} → Урок {rating.lessonNumber}
+                      <p className="text-xs text-gray-500 mt-1 font-medium">
+                        {getModuleName(rating.moduleId)}
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-gray-500">
+                        Урок {rating.lessonNumber}: {getLessonTitle(rating.moduleId, rating.lessonNumber)}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
                         {new Date(rating.completedAt).toLocaleString('uk-UA')}
                       </p>
                     </div>
