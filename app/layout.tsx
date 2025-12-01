@@ -14,13 +14,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Хогвартс - Платформа навчання",
+  title: "Академія Запусків - Платформа навчання",
   description: "Магічна платформа навчання з геймифікацією",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Хогвартс",
+    title: "Академія Запусків",
   },
   icons: {
     icon: "/icons/icon-192x192.svg",
@@ -32,7 +32,7 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#6B46C1",
+  themeColor: "#2466FF",
 };
 
 export default function RootLayout({
@@ -45,7 +45,12 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/icons/icon-192x192.svg" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
-        <meta name="theme-color" content="#6B46C1" />
+        <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.svg" />
+        <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.svg" />
+        <meta name="theme-color" content="#2466FF" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Академія Запусків" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
