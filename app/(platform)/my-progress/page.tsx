@@ -35,6 +35,10 @@ export default function MyProgressPage() {
     try {
       setLoading(true);
       const data = await profileService.getProfile();
+      console.log('Profile loaded:', {
+        avatarUrl: data.user.avatarUrl,
+        computedUrl: getAvatarUrl(data.user.avatarUrl)
+      });
       setProfile(data.user);
       setStats(data.stats);
     } catch (error) {
@@ -164,6 +168,13 @@ export default function MyProgressPage() {
                     src={getAvatarUrl(profile.avatarUrl)}
                     alt={`${profile.firstName} ${profile.lastName}`}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.error('Avatar load error:', {
+                        originalUrl: profile.avatarUrl,
+                        computedUrl: getAvatarUrl(profile.avatarUrl),
+                        error: e
+                      });
+                    }}
                   />
                 ) : (
                   <div className="absolute inset-0 bg-gradient-to-br from-[#4A4A4A] to-[#2A2A2A] flex items-center justify-center">
