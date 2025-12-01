@@ -19,6 +19,8 @@ export default function AvatarsManagementPage() {
   const [editingLevel, setEditingLevel] = useState<number | null>(null);
   const [editForm, setEditForm] = useState({ imageUrl: '', description: '' });
   const [initializing, setInitializing] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     checkAdminAccess();
@@ -79,9 +81,50 @@ export default function AvatarsManagementPage() {
       imageUrl: avatar.imageUrl,
       description: avatar.description || '',
     });
+    setSelectedFile(null);
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
+  const handleUpload = async (level: number) => {
+    if (!selectedFile) {
+      alert('Виберіть файл для завантаження');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      await adminService.uploadAvatarImage(
+        level,
+        selectedFile,
+        editForm.description || undefined
+      );
+      await loadAvatars();
+      setEditingLevel(null);
+      setEditForm({ imageUrl: '', description: '' });
+      setSelectedFile(null);
+      alert('Аватар успішно завантажено!');
+    } catch (error: any) {
+      console.error('Failed to upload avatar:', error);
+      alert(error.response?.data?.message || 'Помилка при завантаженні файлу');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSave = async (level: number) => {
+    // Якщо є вибраний файл, завантажуємо його
+    if (selectedFile) {
+      await handleUpload(level);
+      return;
+    }
+
+    // Інакше просто зберігаємо URL
     try {
       await adminService.setAvatarLevel(
         level,
@@ -120,6 +163,7 @@ export default function AvatarsManagementPage() {
       imageUrl: `/avatars/level-${newLevel}.png`,
       description: `Аватар після ${newLevel} модуля`,
     });
+    setSelectedFile(null);
   };
 
   if (loading) {
@@ -213,11 +257,33 @@ export default function AvatarsManagementPage() {
                       onClick={() => {
                         setEditingLevel(null);
                         setEditForm({ imageUrl: '', description: '' });
+                        setSelectedFile(null);
                       }}
                       className="text-gray-400 hover:text-gray-600"
                     >
                       ✕
                     </button>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Завантажити файл
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#2466FF] focus:border-transparent"
+                    />
+                    {selectedFile && (
+                      <p className="text-xs text-green-600 mt-1">
+                        Обрано: {selectedFile.name}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="text-center text-xs text-gray-500">
+                    АБО
                   </div>
 
                   <div>
@@ -252,10 +318,20 @@ export default function AvatarsManagementPage() {
 
                   <button
                     onClick={() => handleSave(avatar.level)}
-                    className="w-full bg-[#10B981] text-white px-4 py-2 rounded-xl font-semibold text-sm flex items-center justify-center gap-2"
+                    disabled={uploading}
+                    className="w-full bg-[#10B981] text-white px-4 py-2 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    <Save className="w-4 h-4" />
-                    Зберегти
+                    {uploading ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        Завантаження...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        Зберегти
+                      </>
+                    )}
                   </button>
                 </div>
               ) : (
@@ -319,11 +395,33 @@ export default function AvatarsManagementPage() {
                     onClick={() => {
                       setEditingLevel(null);
                       setEditForm({ imageUrl: '', description: '' });
+                      setSelectedFile(null);
                     }}
                     className="text-gray-400 hover:text-gray-600"
                   >
                     ✕
                   </button>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Завантажити файл
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#2466FF] focus:border-transparent"
+                  />
+                  {selectedFile && (
+                    <p className="text-xs text-green-600 mt-1">
+                      Обрано: {selectedFile.name}
+                    </p>
+                  )}
+                </div>
+
+                <div className="text-center text-xs text-gray-500">
+                  АБО
                 </div>
 
                 <div>
@@ -358,10 +456,20 @@ export default function AvatarsManagementPage() {
 
                 <button
                   onClick={() => handleSave(editingLevel)}
-                  className="w-full bg-[#10B981] text-white px-4 py-2 rounded-xl font-semibold text-sm flex items-center justify-center gap-2"
+                  disabled={uploading}
+                  className="w-full bg-[#10B981] text-white px-4 py-2 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  <Save className="w-4 h-4" />
-                  Створити
+                  {uploading ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      Завантаження...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Створити
+                    </>
+                  )}
                 </button>
               </div>
             </div>

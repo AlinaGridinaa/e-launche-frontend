@@ -179,4 +179,24 @@ export const adminService = {
     );
     return response.data;
   },
+
+  async uploadAvatarImage(level: number, file: File, description?: string): Promise<{ level: number; imageUrl: string; description?: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (description) {
+      formData.append('description', description);
+    }
+
+    const response = await axios.post(
+      `${API_URL}/admin/avatars/${level}/upload`,
+      formData,
+      { 
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'multipart/form-data',
+        }
+      }
+    );
+    return response.data;
+  },
 };
