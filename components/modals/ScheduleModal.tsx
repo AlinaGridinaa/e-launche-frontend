@@ -102,8 +102,8 @@ export function ScheduleModal({ isOpen, onClose }: ScheduleModalProps) {
     const dayName = dayNames[date.getDay()];
 
     let timeStr = '';
-    if (event.timeEurope && event.time) {
-      timeStr = ` о ${event.timeEurope} у Європі, ${event.time} у Києві`;
+    if (event.time && event.timeEurope) {
+      timeStr = ` о ${event.time}, ${event.timeEurope}`;
     }
 
     return `${day} ${month} (${dayName})${timeStr}`;
@@ -245,9 +245,9 @@ export function ScheduleModal({ isOpen, onClose }: ScheduleModalProps) {
                         {/* Time */}
                         {(event.time || event.timeEurope) && (
                           <div className="text-sm text-gray-600 mb-2">
-                            {event.timeEurope && <span>{event.timeEurope} (Європа)</span>}
-                            {event.time && event.timeEurope && <span> • </span>}
-                            {event.time && <span>{event.time} (Київ)</span>}
+                            {event.time && <span>о {event.time}</span>}
+                            {event.time && event.timeEurope && <span>, </span>}
+                            {event.timeEurope && <span>{event.timeEurope}</span>}
                           </div>
                         )}
 
