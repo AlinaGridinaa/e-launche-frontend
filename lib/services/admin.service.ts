@@ -144,4 +144,39 @@ export const adminService = {
     );
     return response.data;
   },
+
+  // Avatar management
+  async getAllAvatarLevels(): Promise<Array<{ _id: string; level: number; imageUrl: string; description?: string }>> {
+    const response = await axios.get(
+      `${API_URL}/admin/avatars`,
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  },
+
+  async setAvatarLevel(level: number, imageUrl: string, description?: string): Promise<{ level: number; imageUrl: string; description?: string }> {
+    const response = await axios.put(
+      `${API_URL}/admin/avatars/${level}`,
+      { imageUrl, description },
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  },
+
+  async deleteAvatarLevel(level: number): Promise<{ message: string }> {
+    const response = await axios.delete(
+      `${API_URL}/admin/avatars/${level}`,
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  },
+
+  async initializeDefaultAvatars(): Promise<{ message: string; count: number }> {
+    const response = await axios.post(
+      `${API_URL}/admin/avatars/initialize`,
+      {},
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  },
 };
