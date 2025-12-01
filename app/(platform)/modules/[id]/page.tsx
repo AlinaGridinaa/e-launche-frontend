@@ -30,17 +30,21 @@ export default function ModulePage() {
   const loadModule = async () => {
     try {
       const data = await modulesService.getModuleById(moduleId);
+      console.log('📚 Module data loaded:', data);
+      const completedLessons = data.lessons.filter(l => l.isCompleted).length;
+      console.log(`✅ Progress: ${completedLessons}/${data.lessons.length} lessons completed`);
+      
       const transformedData = {
         id: data._id,
         category: `Модуль ${data.number}`,
         title: data.title,
         totalLessons: data.lessons.length,
-        completedLessons: data.lessons.filter(l => l.isCompleted).length,
+        completedLessons: completedLessons,
         lessons: data.lessons.map(lesson => ({
           id: lesson.number,
           title: lesson.title,
           duration: lesson.duration ? `${lesson.duration} хв` : '',
-          isCompleted: lesson.isCompleted,
+          isCompleted: lesson.isCompleted || false,
           isLocked: false,
           videoUrl: lesson.videoUrl,
         })),
@@ -243,17 +247,37 @@ function LessonCard({
         {/* Dark overlay for better contrast */}
         <div className="absolute inset-0 bg-black/20" />
         
-        {/* Play button */}
+        {/* Play button or Checkmark for completed lessons */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-10 h-10 rounded-full bg-[#2466FF] flex items-center justify-center group-hover:scale-110 transition-transform">
-            <Play className="w-5 h-5 text-white fill-white ml-0.5" />
-          </div>
+          {lesson.isCompleted ? (
+            <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-[#2466FF] flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+            </div>
+          )}
         </div>
 
         {/* e-launch watermark */}
         <div className="absolute top-4 left-4">
           <span className="text-white/80 text-sm font-light tracking-wider">e-launch</span>
         </div>
+        
+        {/* Completed indicator badge in top right */}
+        {lesson.isCompleted && (
+          <div className="absolute top-4 right-4">
+            <div className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Пройдено</span>
+            </div>
+          </div>
+        )}
       </button>
 
       {/* Lesson Info Card - overlapping thumbnail */}
