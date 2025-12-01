@@ -121,7 +121,7 @@ export function ScheduleModal({ isOpen, onClose }: ScheduleModalProps) {
             className="flex items-center gap-2 text-white hover:text-white/80 px-3 py-1.5 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm"
           >
             <X className="w-5 h-5" />
-            <span className="font-medium">Закрыть</span>
+            <span className="font-medium">Закрити</span>
           </button>
          
         </div>
