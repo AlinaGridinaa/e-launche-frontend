@@ -20,7 +20,22 @@ export default function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      router.push('/home');
+      // Перевіряємо роль користувача з токену
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          if (payload.isAdmin) {
+            router.push('/admin');
+          } else if (payload.isCurator) {
+            router.push('/curator');
+          } else {
+            router.push('/home');
+          }
+        } catch (error) {
+          router.push('/home');
+        }
+      }
     }
   }, [isAuthenticated, authLoading, router]);
 
@@ -30,36 +45,36 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Помилка при вході');
-      }
-
-      const data = await response.json();
-      
-      // Зберігаємо токен
-      localStorage.setItem('token', data.token);
-      
-      // Викликаємо login з контексту для оновлення стану
+      // Викликаємо login з контексту - він сам збереже токен і оновить стан
       await login(formData.email, formData.password);
       
-      // Перенаправляємо залежно від ролі
-      if (data.isAdmin) {
-        console.log('🔐 Admin logged in, redirecting to admin panel');
-        router.push('/admin');
-      } else if (data.isCurator) {
-        console.log('📚 Curator logged in, redirecting to curator panel');
-        router.push('/curator');
+      // Після успішного логіну перевіряємо роль з токену
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          console.log('🔑 User payload:', payload);
+          
+          if (payload.isAdmin) {
+            console.log('🔐 Admin logged in, redirecting to admin panel');
+            router.push('/admin');
+          } else if (payload.isCurator) {
+            console.log('📚 Curator logged in, redirecting to curator panel');
+            router.push('/curator');
+          } else {
+            console.log('👤 Regular user logged in, redirecting to home');
+            router.push('/home');
+          }
+        } catch (error) {
+          console.error('❌ Failed to parse token:', error);
+          router.push('/home');
+        }
       } else {
+        console.error('❌ No token found after login');
         router.push('/home');
       }
     } catch (err) {
+      console.error('❌ Login error:', err);
       setError(err instanceof Error ? err.message : 'Помилка при вході');
     } finally {
       setIsLoading(false);
@@ -80,7 +95,7 @@ export default function LoginPage() {
               </g>
             </svg>
           </div>
-          <p className="text-white/80 text-lg">Платформа магічного навчання</p>
+          
         </div>
 
         {/* Login Form Card */}

@@ -76,9 +76,12 @@ class AuthService {
     const token = this.getToken();
     
     if (!token) {
+      console.log('❌ No token found in localStorage');
       throw new Error('Не авторизовано');
     }
 
+    console.log('🔍 Checking auth with token...');
+    
     const response = await fetch(`${API_URL}/auth/me`, {
       method: 'GET',
       headers: {
@@ -87,11 +90,19 @@ class AuthService {
     });
 
     if (!response.ok) {
+      console.log('❌ Auth check failed, status:', response.status);
       this.removeToken();
+      
+      if (response.status === 401) {
+        throw new Error('Сесія закінчилася. Будь ласка, увійдіть знову');
+      }
+      
       throw new Error('Не авторизовано');
     }
 
-    return response.json();
+    const data = await response.json();
+    console.log('✅ Auth check response:', data);
+    return data;
   }
 }
 

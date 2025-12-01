@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { authService } from '@/lib/services/auth.service';
 import WelcomeModal from '@/components/modals/WelcomeModal';
 import { profileService } from '@/lib/services/profile.service';
@@ -31,13 +32,17 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(false);
 
   useEffect(() => {
     // Перевірити чи користувач залогінений при завантаженні
-    checkAuth();
+    if (!isCheckingAuth) {
+      checkAuth();
+    }
   }, []);
 
   useEffect(() => {
@@ -49,31 +54,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   const checkAuth = async () => {
+    if (isCheckingAuth) {
+      console.log('⏭️ Auth check already in progress, skipping...');
+      return;
+    }
+    
+    setIsCheckingAuth(true);
     try {
       const response = await authService.getCurrentUser();
+      console.log('✅ Auth check successful:', response.user?.email);
       setUser(response.user);
     } catch (error) {
+      console.log('❌ Auth check failed:', error instanceof Error ? error.message : 'Unknown error');
       setUser(null);
     } finally {
       setIsLoading(false);
+      setIsCheckingAuth(false);
     }
   };
 
   const login = async (email: string, password: string) => {
+    console.log('🔐 Attempting login for:', email);
     const response = await authService.login({ email, password });
+    console.log('✅ Login successful, setting user:', response.user.email);
     setUser(response.user);
   };
 
   const logout = async () => {
     await authService.logout();
     setUser(null);
+    router.push('/login');
   };
 
   const refreshUser = async () => {
     try {
+      console.log('🔄 Refreshing user data...');
       const response = await authService.getCurrentUser();
+      console.log('✅ User data refreshed:', response.user?.email);
       setUser(response.user);
     } catch (error) {
+      console.log('❌ Failed to refresh user:', error instanceof Error ? error.message : 'Unknown error');
       setUser(null);
     }
   };
