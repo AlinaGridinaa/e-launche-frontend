@@ -167,13 +167,23 @@ export default function MyProgressPage() {
         <div className="px-4 pt-12">
           <h1 className="text-2xl font-bold text-white mb-4">Мій прогрес</h1>
           
-          <button 
-            onClick={() => router.push('/earnings')}
-            className="flex items-center gap-1 px-4 py-2.5 bg-black/20 backdrop-blur-md rounded-[13px] hover:bg-black/30 transition-colors"
-          >
-            <Plus className="w-4 h-4 text-white" />
-            <span className="text-xs font-medium text-white">Додати дохід</span>
-          </button>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => router.push('/earnings')}
+              className="flex items-center gap-1 px-4 py-2.5 bg-black/20 backdrop-blur-md rounded-[13px] hover:bg-black/30 transition-colors"
+            >
+              <Plus className="w-4 h-4 text-white" />
+              <span className="text-xs font-medium text-white">Додати дохід</span>
+            </button>
+            
+            <button 
+              onClick={() => router.push('/achievements')}
+              className="flex items-center gap-1 px-4 py-2.5 bg-black/20 backdrop-blur-md rounded-[13px] hover:bg-black/30 transition-colors"
+            >
+              <span className="text-sm">🏆</span>
+              <span className="text-xs font-medium text-white">Нагороди</span>
+            </button>
+          </div>
         </div>
       </div>
 
