@@ -13,7 +13,13 @@ export function getAvatarUrl(avatarUrl: string | null | undefined): string {
     return avatarUrl;
   }
 
-  // If relative URL, prepend with API URL
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  // If relative URL, prepend with API URL (but remove /api suffix if present)
+  let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  
+  // Remove /api suffix because uploads are served from root, not /api
+  if (apiUrl.endsWith('/api')) {
+    apiUrl = apiUrl.slice(0, -4);
+  }
+  
   return `${apiUrl}${avatarUrl}`;
 }
