@@ -118,6 +118,7 @@ export default function WelcomeModal({ isOpen, faculty, onClose }: WelcomeModalP
           isAnimating ? 'scale-100 translate-y-0' : 'scale-95 translate-y-8'
         }`}
         data-welcome-modal
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Card shell */}
         <div className="rounded-3xl border border-[#E7E7E7] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.08)] overflow-hidden">

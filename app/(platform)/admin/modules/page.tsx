@@ -15,6 +15,8 @@ interface Module {
   unlockDate?: Date;
   category?: string;
   lessonsCount: number;
+  surveyFormUrl?: string;
+  surveyFormTitle?: string;
 }
 
 export default function AdminModulesPage() {
@@ -29,6 +31,8 @@ export default function AdminModulesPage() {
     description: '',
     category: '',
     isLocked: false,
+    surveyFormUrl: '',
+    surveyFormTitle: '',
   });
 
   useEffect(() => {
@@ -95,6 +99,8 @@ export default function AdminModulesPage() {
           description: '',
           category: '',
           isLocked: false,
+          surveyFormUrl: '',
+          surveyFormTitle: '',
         });
         loadModules();
         alert('Модуль створено! ✅');
@@ -131,6 +137,8 @@ export default function AdminModulesPage() {
           description: '',
           category: '',
           isLocked: false,
+          surveyFormUrl: '',
+          surveyFormTitle: '',
         });
         loadModules();
         alert('Модуль оновлено! ✅');
@@ -194,6 +202,8 @@ export default function AdminModulesPage() {
       description: module.description,
       category: module.category || '',
       isLocked: module.isLocked,
+      surveyFormUrl: module.surveyFormUrl || '',
+      surveyFormTitle: module.surveyFormTitle || '',
     });
   };
 
@@ -229,6 +239,8 @@ export default function AdminModulesPage() {
                 description: '',
                 category: '',
                 isLocked: false,
+                surveyFormUrl: '',
+                surveyFormTitle: '',
               });
             }}
             className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors"
@@ -362,6 +374,38 @@ export default function AdminModulesPage() {
                 />
               </div>
 
+              {/* Survey Form Fields */}
+              <div className="border-t border-gray-200 pt-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-3">📋 Анкета після модуля (опціонально)</h3>
+                
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Назва анкети</label>
+                    <input
+                      type="text"
+                      value={formData.surveyFormTitle}
+                      onChange={(e) => setFormData({ ...formData, surveyFormTitle: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+                      placeholder="Анкета для запитань до модуля"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Посилання на анкету</label>
+                    <input
+                      type="url"
+                      value={formData.surveyFormUrl}
+                      onChange={(e) => setFormData({ ...formData, surveyFormUrl: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+                      placeholder="https://forms.gle/..."
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Google Form або інше посилання на анкету
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -393,6 +437,8 @@ export default function AdminModulesPage() {
                       description: '',
                       category: '',
                       isLocked: false,
+                      surveyFormUrl: '',
+                      surveyFormTitle: '',
                     });
                   }}
                   className="w-full px-4 py-3 bg-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-300 transition-colors"

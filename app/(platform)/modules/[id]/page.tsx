@@ -44,6 +44,8 @@ export default function ModulePage() {
           isLocked: false,
           videoUrl: lesson.videoUrl,
         })),
+        surveyFormUrl: data.surveyFormUrl,
+        surveyFormTitle: data.surveyFormTitle,
       };
       setModuleData(transformedData);
     } catch (error) {
@@ -142,6 +144,40 @@ export default function ModulePage() {
               moduleId={moduleId as string}
             />
           ))}
+
+          {/* Survey Form Block - показується після всіх уроків */}
+          {moduleData.surveyFormUrl && (
+            <a
+              href={moduleData.surveyFormUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-all"
+            >
+              <div className="flex items-center gap-4">
+                {/* Icon */}
+                <div className="w-16 h-16 bg-[#E9F0FF] rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <svg className="w-8 h-8 text-[#2466FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1">
+                  <h3 className="text-base font-bold text-black mb-1">
+                    {moduleData.surveyFormTitle || 'Анкета для запитань до модуля'}
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    Натисніть, щоб заповнити анкету
+                  </p>
+                </div>
+
+                {/* Arrow */}
+                <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </a>
+          )}
         </div>
       </div>
     </div>

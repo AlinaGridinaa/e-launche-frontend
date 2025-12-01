@@ -39,6 +39,8 @@ export interface Module {
   lessons: Lesson[];
   progress: number;
   category: string;
+  surveyFormUrl?: string;
+  surveyFormTitle?: string;
   createdAt: Date;
   updatedAt: Date;
 }
