@@ -74,7 +74,7 @@ async function updateSchedule() {
     // 2. Delete all existing events
     console.log('🗑️  Deleting old events...');
     for (const event of existingEvents) {
-      await fetch(`${API_URL}/admin/schedule/${event._id}`, {
+      await fetch(`${API_URL}/schedule/${event._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -86,7 +86,7 @@ async function updateSchedule() {
     // 3. Create new events
     console.log('➕ Creating new events...');
     for (const event of newSchedule) {
-      const response = await fetch(`${API_URL}/admin/schedule`, {
+      const response = await fetch(`${API_URL}/schedule`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

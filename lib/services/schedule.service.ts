@@ -97,7 +97,7 @@ export const scheduleService = {
   // Admin methods
   async createEvent(eventData: Partial<ScheduleEvent>): Promise<ScheduleEvent> {
     const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}/admin/schedule`, {
+    const response = await fetch(`${API_URL}/schedule`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ export const scheduleService = {
 
   async updateEvent(id: string, eventData: Partial<ScheduleEvent>): Promise<ScheduleEvent> {
     const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}/admin/schedule/${id}`, {
+    const response = await fetch(`${API_URL}/schedule/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -137,7 +137,7 @@ export const scheduleService = {
 
   async deleteEvent(id: string): Promise<void> {
     const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}/admin/schedule/${id}`, {
+    const response = await fetch(`${API_URL}/schedule/${id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
