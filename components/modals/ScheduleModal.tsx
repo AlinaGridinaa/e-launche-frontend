@@ -297,7 +297,7 @@ export function ScheduleModal({ isOpen, onClose }: ScheduleModalProps) {
             {/* Schedule section */}
             <div className="mt-4">
               <h2 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-200 pb-3">
-                📅 Розклад навчання
+                📅 Розклад першого тижня навчання
               </h2>
 
               {loading ? (
