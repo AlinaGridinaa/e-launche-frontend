@@ -282,7 +282,7 @@ export default function LessonPage() {
                   className="bg-[#F2F2F2] backdrop-blur-sm rounded-xl px-4 py-2.5 hover:bg-gray-200 transition-colors"
                 >
                   <span className="text-xs font-medium text-black">
-                    Позначити як пройдений
+                    {isCompleted ? 'Позначено як пройдений' : 'Позначити як пройдений'}
                   </span>
                 </button>
 

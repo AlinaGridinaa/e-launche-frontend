@@ -252,37 +252,17 @@ function LessonCard({
         {/* Dark overlay for better contrast */}
         <div className="absolute inset-0 bg-black/20" />
         
-        {/* Play button or Checkmark for completed lessons */}
+        {/* Play button */}
         <div className="absolute inset-0 flex items-center justify-center">
-          {lesson.isCompleted ? (
-            <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-          ) : (
-            <div className="w-10 h-10 rounded-full bg-[#2466FF] flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Play className="w-5 h-5 text-white fill-white ml-0.5" />
-            </div>
-          )}
+          <div className="w-10 h-10 rounded-full bg-[#2466FF] flex items-center justify-center group-hover:scale-110 transition-transform">
+            <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+          </div>
         </div>
 
         {/* e-launch watermark */}
         <div className="absolute top-4 left-4">
           <span className="text-white/80 text-sm font-light tracking-wider">e-launch</span>
         </div>
-        
-        {/* Completed indicator badge in top right */}
-        {lesson.isCompleted && (
-          <div className="absolute top-4 right-4">
-            <div className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Пройдено</span>
-            </div>
-          </div>
-        )}
       </button>
 
       {/* Lesson Info Card - overlapping thumbnail */}
@@ -299,15 +279,20 @@ function LessonCard({
 
             {/* Status badge */}
             <div
-              className={`inline-flex items-center rounded-full px-2 py-1.5 ${
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-1.5 ${
                 lesson.isCompleted
-                  ? 'bg-[#E9F0FF]'
+                  ? 'bg-[#10B981]'
                   : 'bg-[#F2F2F2]'
               }`}
             >
+              {lesson.isCompleted && (
+                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
               <span
                 className={`text-xs font-bold ${
-                  lesson.isCompleted ? 'text-[#2466FF]' : 'text-[#7F7F7F]'
+                  lesson.isCompleted ? 'text-white' : 'text-[#7F7F7F]'
                 }`}
               >
                 {lesson.isCompleted ? 'Пройдено' : 'Не пройдено'}
