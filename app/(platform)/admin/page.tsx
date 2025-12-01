@@ -172,6 +172,24 @@ export default function AdminDashboardPage() {
             </div>
             <div className="text-[#2466FF]">→</div>
           </button>
+
+          <button
+            onClick={() => router.push('/admin/schedule')}
+            className="w-full bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#E9F0FF] rounded-xl flex items-center justify-center">
+                <svg className="w-5 h-5 text-[#2466FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-black">Розклад навчання</p>
+                <p className="text-xs text-gray-500">Керування подіями та розкладом</p>
+              </div>
+            </div>
+            <div className="text-[#2466FF]">→</div>
+          </button>
         </div>
       </div>
     </div>

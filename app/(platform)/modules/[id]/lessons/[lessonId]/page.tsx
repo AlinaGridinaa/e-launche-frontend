@@ -491,6 +491,45 @@ export default function LessonPage() {
                     </div>
                   </div>
                 )}
+
+                {/* Homework Section - Also on Info Tab */}
+                {lessonData.homework && (
+                  <div className="bg-white rounded-2xl p-4 mt-4">
+                    <h3 className="text-base font-bold text-black mb-3">
+                      Домашнє завдання
+                    </h3>
+
+                    <div className="space-y-4">
+                      {/* Homework Description */}
+                      <div className="p-3 bg-[#F2F2F2] rounded-xl">
+                        <p className="text-sm text-black leading-relaxed whitespace-pre-wrap">
+                          {lessonData.homework}
+                        </p>
+                      </div>
+
+                      {/* Quick link to homework tab */}
+                      <button
+                        onClick={() => setActiveTab('homework')}
+                        className="w-full flex items-center justify-between p-3 bg-[#E9F0FF] rounded-xl hover:bg-[#d9e5ff] transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-[#2466FF] rounded-xl flex items-center justify-center">
+                            <Upload className="w-5 h-5 text-white" />
+                          </div>
+                          <div className="text-left">
+                            <p className="text-sm font-bold text-[#2466FF]">
+                              {homeworkSubmitted ? 'Переглянути відповідь' : 'Відправити домашнє завдання'}
+                            </p>
+                            <p className="text-xs text-gray-600">
+                              {homeworkSubmitted ? 'Ваше ДЗ вже відправлено' : 'Натисніть, щоб відправити'}
+                            </p>
+                          </div>
+                        </div>
+                        <ChevronDown className="w-5 h-5 text-[#2466FF] -rotate-90" />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </>
           ) : activeTab === 'materials' ? (

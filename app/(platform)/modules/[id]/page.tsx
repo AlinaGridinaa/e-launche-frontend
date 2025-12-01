@@ -51,6 +51,11 @@ export default function ModulePage() {
         surveyFormUrl: data.surveyFormUrl,
         surveyFormTitle: data.surveyFormTitle,
       };
+      console.log('📋 Survey form data:', {
+        url: data.surveyFormUrl,
+        title: data.surveyFormTitle,
+        hasUrl: !!data.surveyFormUrl
+      });
       setModuleData(transformedData);
     } catch (error) {
       console.error('Failed to load module:', error);
