@@ -67,11 +67,11 @@ export default function WelcomeModal({ isOpen, faculty, onClose }: WelcomeModalP
   };
 
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
       setIsVisible(true);
       setTimeout(() => setIsAnimating(true), 50);
     }
-  }, [!isOpen]);
+  }, [isOpen]);
 
   const handleClose = () => {
     setIsAnimating(false);

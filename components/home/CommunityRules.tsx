@@ -2,13 +2,20 @@
 
 import Image from 'next/image';
 
+
 export function CommunityRules() {
   return (
     <div className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
       <div className="flex items-center gap-4">
         {/* Icon */}
         <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center flex-shrink-0">
-          <span className="text-4xl">🏆</span>
+          <Image 
+            src="/icons/cubok.svg" 
+            alt="Trophy" 
+            width={64} 
+            height={64}
+            className="object-contain"
+          />
         </div>
 
         {/* Content */}

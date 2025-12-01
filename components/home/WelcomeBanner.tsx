@@ -5,14 +5,15 @@ import Image from 'next/image';
 
 export function WelcomeBanner() {
   return (
-    <div className="relative w-[358px]  h-[358px] aspect-square rounded-2xl overflow-hidden shadow-lg">
+    <div className="relative w-full h-[308px] aspect-square rounded-2xl overflow-hidden shadow-lg">
       {/* Background Image */}
       <Image
         src="/images/Banner.png"
         alt="Welcome Banner"
         fill
-        className="object-сover"
+        className="object-cover"
         priority
+        unoptimized
       />
       
 
