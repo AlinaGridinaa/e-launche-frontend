@@ -2,28 +2,57 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, Heart } from 'lucide-react';
-
-const tabs = [
-  {
-    name: 'Головна',
-    href: '/home',
-    icon: Home,
-  },
-  {
-    name: 'Мій прогрес',
-    href: '/my-progress',
-    icon: BookOpen,
-  },
-  {
-    name: 'Обране',
-    href: '/favorites',
-    icon: Heart,
-  },
-];
+import { Home, BookOpen, Heart, Shield, Users } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function BottomTabBar() {
   const pathname = usePathname();
+  const { user } = useAuth();
+
+  // Базові таби для всіх
+  const baseTabs = [
+    {
+      name: 'Головна',
+      href: '/home',
+      icon: Home,
+    },
+    {
+      name: 'Мій прогрес',
+      href: '/my-progress',
+      icon: BookOpen,
+    },
+    {
+      name: 'Обране',
+      href: '/favorites',
+      icon: Heart,
+    },
+  ];
+
+  // Додаткові таби для адміна
+  const adminTab = {
+    name: 'Адмін',
+    href: '/admin',
+    icon: Shield,
+  };
+
+  // Додаткові таби для куратора
+  const curatorTab = {
+    name: 'Куратор',
+    href: '/curator',
+    icon: Users,
+  };
+
+  // Формуємо фінальний список табів
+  let tabs = [...baseTabs];
+  
+  if (user?.isAdmin) {
+    tabs.push(adminTab);
+  }
+  
+  if (user?.isCurator && !user?.isAdmin) {
+    // Показуємо таб куратора тільки якщо користувач не адмін
+    tabs.push(curatorTab);
+  }
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-4 px-4">

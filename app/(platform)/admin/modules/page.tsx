@@ -326,7 +326,7 @@ export default function AdminModulesPage() {
               </h2>
             </div>
 
-            <form onSubmit={editingModule ? handleUpdateModule : handleCreateModule} className="p-6 space-y-4">
+            <form onSubmit={editingModule ? handleUpdateModule : handleCreateModule} className="p-6 pb-32 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Номер модуля <span className="text-red-500">*</span>

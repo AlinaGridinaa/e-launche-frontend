@@ -437,7 +437,7 @@ export default function AdminModuleLessonsPage() {
               </h2>
             </div>
 
-            <form onSubmit={editingLesson ? handleUpdateLesson : handleCreateLesson} className="p-6 space-y-4">
+            <form onSubmit={editingLesson ? handleUpdateLesson : handleCreateLesson} className="p-6 pb-32 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Номер уроку <span className="text-red-500">*</span>
@@ -551,7 +551,7 @@ export default function AdminModuleLessonsPage() {
               <p className="text-sm text-gray-600">{selectedLesson.title}</p>
             </div>
 
-            <div className="p-6">
+            <div className="p-6 pb-32">
               {/* Existing Materials */}
               <div className="mb-6">
                 <h3 className="text-sm font-medium text-gray-700 mb-3">Поточні матеріали:</h3>

@@ -405,7 +405,7 @@ export default function AdminUsersPage() {
             </div>
 
             {/* Форма */}
-            <div className="p-6 space-y-4">
+            <div className="p-6 pb-32 space-y-4">
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -619,7 +619,7 @@ export default function AdminUsersPage() {
             </div>
 
             {/* Список нагород */}
-            <div className="p-6">
+            <div className="p-6 pb-32">
               <h3 className="font-bold text-base text-black mb-3">
                 Отримані нагороди ({userAchievements.length})
               </h3>
@@ -690,7 +690,7 @@ export default function AdminUsersPage() {
               </button>
             </div>
 
-            <div className="p-6 space-y-4">
+            <div className="p-6 pb-32 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Оберіть куратора <span className="text-red-500">*</span>

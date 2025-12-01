@@ -18,6 +18,7 @@ interface User {
   hasAcceptedRules: boolean;
   hasSeenWelcomeModal?: boolean;
   isAdmin: boolean;
+  isCurator?: boolean;
 }
 
 interface AuthContextType {
