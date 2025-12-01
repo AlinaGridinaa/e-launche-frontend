@@ -9,25 +9,25 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icons/180x180 - iOS (apple-touch-icon).png",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/192x192_мінімальний_розмір_для_Android.png",
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/384x384 - Android splash.png",
-      "sizes": "384x384",
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/icons/512x512_рекомендований_розмір_для_splash_screen.png",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

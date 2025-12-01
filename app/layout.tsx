@@ -23,8 +23,8 @@ export const metadata: Metadata = {
     title: "Академія Запусків",
   },
   icons: {
-    icon: "/icons/192x192_мінімальний_розмір_для_Android.png",
-    apple: "/icons/180x180 - iOS (apple-touch-icon).png",
+    icon: "/icons/icon-192.png",
+    apple: "/icons/apple-touch-icon.png",
   },
 };
 
@@ -43,10 +43,12 @@ export default function RootLayout({
   return (
     <html lang="uk">
       <head>
-  <link rel="icon" href="/icons/192x192_мінімальний_розмір_для_Android.png" />
-  <link rel="apple-touch-icon" href="/icons/180x180 - iOS (apple-touch-icon).png" />
-  <link rel="apple-touch-icon" sizes="192x192" href="/icons/192x192_мінімальний_розмір_для_Android.png" />
-  <link rel="apple-touch-icon" sizes="512x512" href="/icons/512x512_рекомендований_розмір_для_splash_screen.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
+        <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png" />
         <meta name="theme-color" content="#2466FF" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
