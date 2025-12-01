@@ -208,6 +208,22 @@ export default function AdminDashboardPage() {
             </div>
             <div className="text-[#2466FF]">→</div>
           </button>
+
+          <button
+            onClick={() => router.push('/admin/lesson-ratings')}
+            className="w-full bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#FFF4E6] rounded-xl flex items-center justify-center">
+                <span className="text-xl">⭐</span>
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-black">Оцінки уроків</p>
+                <p className="text-xs text-gray-500">Відгуки студентів про уроки</p>
+              </div>
+            </div>
+            <div className="text-[#2466FF]">→</div>
+          </button>
         </div>
       </div>
     </div>

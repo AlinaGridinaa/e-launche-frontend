@@ -7,6 +7,7 @@ import { modulesService } from '@/lib/services/modules.service';
 import { favoritesService } from '@/lib/services/favorites.service';
 import { progressService } from '@/lib/services/progress.service';
 import { homeworkService, Homework } from '@/lib/services/homework.service';
+import LessonRatingModal from '@/components/modals/LessonRatingModal';
 
 // Helper function to extract YouTube video ID
 const getYouTubeVideoId = (url: string) => {
@@ -38,6 +39,7 @@ export default function LessonPage() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [showRatingModal, setShowRatingModal] = useState(false);
   
   // Homework states
   const [homework, setHomework] = useState<Homework | null>(null);
@@ -160,16 +162,26 @@ export default function LessonPage() {
       const newStatus = !isCompleted;
       
       if (newStatus) {
-        // Позначити як завершений
-        await progressService.completeLesson(moduleId, lessonNumber);
+        // Показуємо модалку з оцінкою
+        setShowRatingModal(true);
       } else {
         // Зняти позначку завершення
         await progressService.uncompleteLesson(moduleId, lessonNumber);
+        setIsCompleted(newStatus);
       }
-      
-      setIsCompleted(newStatus);
     } catch (error) {
       console.error('Failed to update lesson completion:', error);
+    }
+  };
+
+  const handleSubmitRating = async (moodRating: number, usefulnessRating: number) => {
+    try {
+      // Відправляємо оцінки разом з позначкою завершення
+      await progressService.completeLesson(moduleId, lessonNumber, moodRating, usefulnessRating);
+      setIsCompleted(true);
+    } catch (error) {
+      console.error('Failed to submit rating:', error);
+      throw error;
     }
   };
 
@@ -769,6 +781,14 @@ export default function LessonPage() {
           )}
         </div>
       </div>
+
+      {/* Rating Modal */}
+      <LessonRatingModal
+        isOpen={showRatingModal}
+        onClose={() => setShowRatingModal(false)}
+        onSubmit={handleSubmitRating}
+        lessonTitle={lessonData?.title || ''}
+      />
     </div>
   );
 }

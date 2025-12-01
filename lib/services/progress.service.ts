@@ -9,10 +9,16 @@ function getAuthHeaders(): HeadersInit {
 }
 
 export const progressService = {
-  async completeLesson(moduleId: string, lessonNumber: number): Promise<{ success: boolean; message: string; completedLessons: number }> {
+  async completeLesson(
+    moduleId: string, 
+    lessonNumber: number,
+    moodRating?: number,
+    usefulnessRating?: number
+  ): Promise<{ success: boolean; message: string; completedLessons: number }> {
     const response = await fetch(`${API_URL}/progress/lessons/${moduleId}/${lessonNumber}/complete`, {
       method: 'POST',
       headers: getAuthHeaders(),
+      body: JSON.stringify({ moodRating, usefulnessRating }),
     });
 
     if (!response.ok) {
