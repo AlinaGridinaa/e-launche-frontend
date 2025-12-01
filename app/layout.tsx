@@ -23,8 +23,8 @@ export const metadata: Metadata = {
     title: "Академія Запусків",
   },
   icons: {
-    icon: "/icons/icon-192x192.svg",
-    apple: "/icons/icon-192x192.svg",
+    icon: "/icons/192x192_мінімальний_розмір_для_Android.png",
+    apple: "/icons/180x180 - iOS (apple-touch-icon).png",
   },
 };
 
@@ -43,10 +43,10 @@ export default function RootLayout({
   return (
     <html lang="uk">
       <head>
-        <link rel="icon" href="/icons/icon-192x192.svg" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
-        <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.svg" />
-        <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.svg" />
+  <link rel="icon" href="/icons/192x192_мінімальний_розмір_для_Android.png" />
+  <link rel="apple-touch-icon" href="/icons/180x180 - iOS (apple-touch-icon).png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="/icons/192x192_мінімальний_розмір_для_Android.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="/icons/512x512_рекомендований_розмір_для_splash_screen.png" />
         <meta name="theme-color" content="#2466FF" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
