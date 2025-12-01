@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronDown, MoreHorizontal, X, Plus, Camera, Lock } from 'lucide-react';
+import { ChevronDown, MoreHorizontal, X, Plus, Lock } from 'lucide-react';
 import Image from 'next/image';
 import { profileService, UserProfile, ProfileStats } from '@/lib/services/profile.service';
 import { achievementsService, UserAchievement } from '@/lib/services/achievements.service';
@@ -22,9 +22,7 @@ export default function MyProgressPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [userAchievements, setUserAchievements] = useState<UserAchievement[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadProfile();
@@ -60,38 +58,6 @@ export default function MyProgressPage() {
       setUserAchievements(data);
     } catch (error) {
       console.error('Failed to load user achievements:', error);
-    }
-  };
-
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Перевірка типу файлу
-    if (!file.type.startsWith('image/')) {
-      alert('Будь ласка, виберіть зображення');
-      return;
-    }
-
-    // Перевірка розміру (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Файл занадто великий. Максимальний розмір 5MB');
-      return;
-    }
-
-    try {
-      setUploading(true);
-      const result = await profileService.uploadAvatar(file);
-      setProfile(result.user);
-    } catch (error) {
-      console.error('Failed to upload avatar:', error);
-      alert('Помилка завантаження аватарки');
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -188,46 +154,22 @@ export default function MyProgressPage() {
           {/* Верхня частина з градієнтом */}
           <div className=" p-4">
             <div className="flex gap-3.5">
-              {/* Аватар з можливістю завантаження */}
+              {/* Аватар (автоматично оновлюється після проходження модулів) */}
               <div 
-                className="w-[123px] h-[164px] bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex items-center justify-center overflow-hidden relative border border-white/50 cursor-pointer group"
-                onClick={handleAvatarClick}
+                className="w-[123px] h-[164px] bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex items-center justify-center overflow-hidden relative border border-white/50"
               >
                 {profile.avatarUrl ? (
-                  <>
-                    <img 
-                      src={profile.avatarUrl.startsWith('http') ? profile.avatarUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${profile.avatarUrl}`}
-                      alt={`${profile.firstName} ${profile.lastName}`}
-                      className="w-full h-full object-cover"
-                    />
-                    {/* Overlay при наведенні */}
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <Camera className="w-8 h-8 text-white" />
-                    </div>
-                  </>
+                  <img 
+                    src={profile.avatarUrl.startsWith('http') ? profile.avatarUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${profile.avatarUrl}`}
+                    alt={`${profile.firstName} ${profile.lastName}`}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <div className="absolute inset-0 bg-gradient-to-br from-[#4A4A4A] to-[#2A2A2A] flex items-center justify-center">
-                    <div className="text-center">
-                      <span className="text-6xl">🧙‍♂️</span>
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <Camera className="w-8 h-8 text-white" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {uploading && (
-                  <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-                    <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-6xl">🧙‍♂️</span>
                   </div>
                 )}
               </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-              />
 
               {/* Інформація */}
               <div className="flex-1 flex flex-col justify-between">
