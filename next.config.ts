@@ -10,9 +10,10 @@ const nextConfig: NextConfig = {
 
 export default withPWA({
   dest: "public",
-  register: true,
+  register: false, // Вимикаємо автоматичну реєстрацію - ми реєструємо sw-custom.js вручну
   skipWaiting: true,
   disable: process.env.NODE_ENV === "development",
+  sw: "sw-custom.js", // Використовуємо наш кастомний Service Worker
   runtimeCaching: [
     {
       urlPattern: /^https?.*/,

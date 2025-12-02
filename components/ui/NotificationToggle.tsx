@@ -43,23 +43,37 @@ export default function NotificationToggle() {
         if (success) {
           setIsSubscribed(false);
           setPermission('default');
+          alert('✅ Нотифікації вимкнено');
+        } else {
+          alert('❌ Не вдалося вимкнути нотифікації');
         }
       } else {
         // Підписатися
+        console.log('Subscribing to notifications...');
         const success = await notificationsService.subscribe();
+        console.log('Subscribe result:', success);
+        
         if (success) {
           setIsSubscribed(true);
           setPermission('granted');
+          alert('✅ Нотифікації увімкнено! Тепер ви будете отримувати сповіщення.');
         } else {
           const perm = notificationsService.getPermission();
           setPermission(perm);
+          
+          if (perm === 'denied') {
+            alert('❌ Нотифікації заблоковані в налаштуваннях браузера. Будь ласка, дозвольте їх.');
+          } else {
+            alert('❌ Не вдалося підписатись на нотифікації. Спробуйте ще раз.');
+          }
         }
       }
     } catch (error) {
       console.error('Error toggling notifications:', error);
-      alert('Помилка при зміні налаштувань нотифікацій');
+      alert('❌ Помилка при зміні налаштувань нотифікацій');
     } finally {
       setIsLoading(false);
+      await checkNotificationStatus(); // Перевіряємо статус після зміни
     }
   };
 

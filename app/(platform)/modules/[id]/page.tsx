@@ -103,7 +103,7 @@ export default function ModulePage() {
               className="mb-6 inline-flex items-center gap-2 bg-black/10 backdrop-blur-sm rounded-full px-3 py-2 hover:bg-black/20 transition-colors"
             >
               <X className="w-5 h-5 text-gray-900" />
-              <span className="text-sm font-medium text-gray-900">Закрыть</span>
+              <span className="text-sm font-medium text-gray-900">Закрити</span>
             </button>
 
             {/* Module Info */}

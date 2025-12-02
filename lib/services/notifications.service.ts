@@ -70,24 +70,30 @@ export const notificationsService = {
   },
 
   // Підписка на push-нотифікації
-  async subscribe(): Promise<{ success: boolean; message: string }> {
+  async subscribe(): Promise<boolean> {
     try {
       // Перевіряємо підтримку
       if (!this.isSupported()) {
-        throw new Error('Push notifications are not supported');
+        console.error('Push notifications are not supported');
+        return false;
       }
 
       // Запитуємо дозвіл
       const permission = await this.requestPermission();
+      console.log('Notification permission:', permission);
+      
       if (permission !== 'granted') {
-        throw new Error('Notification permission denied');
+        console.error('Notification permission denied');
+        return false;
       }
 
-      // Реєструємо Service Worker
-      const registration = await this.registerServiceWorker();
+      // Чекаємо на готовність Service Worker
+      const registration = await navigator.serviceWorker.ready;
+      console.log('Service Worker ready:', registration);
 
       // Отримуємо VAPID ключ
       const vapidPublicKey = await this.getVapidPublicKey();
+      console.log('VAPID public key received');
       const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
 
       // Підписуємось на push
@@ -95,6 +101,7 @@ export const notificationsService = {
         userVisibleOnly: true,
         applicationServerKey: convertedVapidKey as BufferSource,
       });
+      console.log('Push subscription created:', subscription);
 
       // Відправляємо підписку на backend
       const response = await fetch(`${API_URL}/notifications/subscribe`, {
@@ -104,19 +111,22 @@ export const notificationsService = {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save subscription');
+        const error = await response.text();
+        console.error('Failed to save subscription:', error);
+        return false;
       }
 
       const result = await response.json();
-      return result;
+      console.log('Subscription saved:', result);
+      return true;
     } catch (error) {
       console.error('Failed to subscribe:', error);
-      throw error;
+      return false;
     }
   },
 
   // Відписка від нотифікацій
-  async unsubscribe(): Promise<{ success: boolean; message: string }> {
+  async unsubscribe(): Promise<boolean> {
     try {
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.getSubscription();
@@ -124,6 +134,7 @@ export const notificationsService = {
       if (subscription) {
         // Відписуємось локально
         await subscription.unsubscribe();
+        console.log('Unsubscribed locally');
 
         // Видаляємо з backend
         const response = await fetch(`${API_URL}/notifications/unsubscribe`, {
@@ -133,16 +144,19 @@ export const notificationsService = {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to remove subscription from server');
+          console.error('Failed to remove subscription from server');
+          return false;
         }
 
-        return await response.json();
+        console.log('Subscription removed from server');
+        return true;
       }
 
-      return { success: true, message: 'No active subscription' };
+      console.log('No active subscription');
+      return true;
     } catch (error) {
       console.error('Failed to unsubscribe:', error);
-      throw error;
+      return false;
     }
   },
 

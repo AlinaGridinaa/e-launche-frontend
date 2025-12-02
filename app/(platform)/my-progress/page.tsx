@@ -100,7 +100,7 @@ export default function MyProgressPage() {
             className="flex items-center gap-2 px-4 py-2 bg-black/20 backdrop-blur-md rounded-[32px] hover:bg-black/30 transition-colors"
           >
             <X className="w-5 h-5 text-white" />
-            <span className="text-sm font-medium text-white">Закрить</span>
+            <span className="text-sm font-medium text-white">Закрити</span>
           </button>
           <div className="relative">
             <button 
