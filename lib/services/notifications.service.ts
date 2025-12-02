@@ -34,10 +34,16 @@ export const notificationsService = {
   // Запит дозволу
   async requestPermission(): Promise<NotificationPermission> {
     if (!this.isSupported()) {
+      console.error('Push notifications are not supported');
       throw new Error('Push notifications are not supported');
     }
 
+    console.log('🔔 Requesting notification permission...');
+    console.log('Current permission:', Notification.permission);
+    
     const permission = await Notification.requestPermission();
+    console.log('Permission result:', permission);
+    
     return permission;
   },
 
@@ -61,11 +67,15 @@ export const notificationsService = {
 
   // Отримати VAPID публічний ключ
   async getVapidPublicKey(): Promise<string> {
+    console.log('🔑 Fetching VAPID public key from:', `${API_URL}/notifications/vapid-public-key`);
+    
     const response = await fetch(`${API_URL}/notifications/vapid-public-key`);
     if (!response.ok) {
+      console.error('Failed to get VAPID public key:', response.status, response.statusText);
       throw new Error('Failed to get VAPID public key');
     }
     const data = await response.json();
+    console.log('✅ VAPID public key received:', data.publicKey.substring(0, 20) + '...');
     return data.publicKey;
   },
 

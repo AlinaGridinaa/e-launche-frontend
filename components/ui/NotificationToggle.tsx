@@ -11,24 +11,30 @@ export default function NotificationToggle() {
   const [permission, setPermission] = useState<NotificationPermission>('default');
 
   useEffect(() => {
+    console.log('🔔 NotificationToggle mounted');
     checkNotificationStatus();
   }, []);
 
   const checkNotificationStatus = async () => {
+    console.log('🔍 Checking notification status...');
     setIsLoading(true);
     
     const supported = notificationsService.isSupported();
+    console.log('   - Supported:', supported);
     setIsSupported(supported);
 
     if (supported) {
       const perm = notificationsService.getPermission();
+      console.log('   - Permission:', perm);
       setPermission(perm);
 
       const subscribed = await notificationsService.isSubscribed();
+      console.log('   - Subscribed:', subscribed);
       setIsSubscribed(subscribed);
     }
 
     setIsLoading(false);
+    console.log('✅ Notification status check complete');
   };
 
   const handleToggle = async () => {
