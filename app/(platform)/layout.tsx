@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomTabBar } from '@/components/layout/BottomTabBar';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAutoSubscribeNotifications } from '@/hooks/useAutoSubscribeNotifications';
 
 export default function PlatformLayout({
   children,
@@ -12,6 +13,9 @@ export default function PlatformLayout({
 }) {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
+  
+  // Автоматична підписка на push-нотифікації
+  useAutoSubscribeNotifications();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {

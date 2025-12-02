@@ -7,7 +7,6 @@ import Image from 'next/image';
 import { profileService, UserProfile, ProfileStats } from '@/lib/services/profile.service';
 import { achievementsService, UserAchievement } from '@/lib/services/achievements.service';
 import { getAvatarUrl } from '@/lib/utils/avatar';
-import NotificationToggle from '@/components/ui/NotificationToggle';
 
 interface LeaderboardEntry {
   rank: number;
@@ -245,13 +244,8 @@ export default function MyProgressPage() {
       </div>
       
 
-      {/* Push-нотифікації */}
-      <div className="px-4 mt-4">
-        <NotificationToggle />
-      </div>
-
       {/* Таби */}
-      <div className="px-4 mt-6">
+      <div className="px-4 mt-4">
         <div className="flex gap-2">
           <button
             onClick={() => setActiveTab('rating')}
