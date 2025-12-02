@@ -306,33 +306,89 @@ export function ScheduleModal({ isOpen, onClose }: ScheduleModalProps) {
                   Немає заплановованих подій на цей місяць
                 </div>
               ) : (
-                <div className="space-y-4 text-sm">
-                  {Object.values(eventsByDate).flat().map((event) => (
-                    <div key={event._id} className={event.isCompleted ? 'opacity-60' : ''}>
-                      <p className="text-gray-600 mb-1">
-                        {formatEventDate(event)}
-                      </p>
-                      <p className="font-bold text-gray-900">
-                        {event.title}
-                        {event.isCompleted && ' ✓'}
-                      </p>
-                      {event.description && (
-                        <p className="text-gray-700 mt-1">
-                          {event.description}
+                <div className="space-y-4">
+                  {Object.values(eventsByDate).flat().map((event) => {
+                    const eventDate = new Date(event.date);
+                    const day = eventDate.getDate();
+                    const monthNames = [
+                      'січня', 'лютого', 'березня', 'квітня', 'травня', 'червня',
+                      'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'
+                    ];
+                    const month = monthNames[eventDate.getMonth()];
+                    const dayNames = ['неділя', 'понеділок', 'вівторок', 'середа', 'четвер', 'п\'ятниця', 'субота'];
+                    const dayName = dayNames[eventDate.getDay()];
+
+                    return (
+                      <div 
+                        key={event._id} 
+                        className={`bg-white rounded-2xl p-4 shadow-sm border border-gray-200 ${
+                          event.isCompleted ? 'opacity-60' : ''
+                        }`}
+                      >
+                        {/* Дата і час - головний акцент */}
+                        <div className="flex items-start gap-3 mb-2">
+                          <div className="flex-shrink-0 mt-0.5">
+                            {event.isCompleted ? (
+                              <span className="text-2xl">✅</span>
+                            ) : (
+                              <span className="text-2xl">📅</span>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            {/* Дата - великим жирним */}
+                            <div className="flex items-baseline gap-2 mb-1">
+                              <span className="text-xl font-bold text-[#2466FF]">
+                                {day} {month}
+                              </span>
+                              <span className="text-sm text-gray-600">
+                                ({dayName})
+                              </span>
+                            </div>
+                            
+                            {/* Час - виділяємо */}
+                            {(event.time || event.timeEurope) && (
+                              <div className="flex flex-wrap gap-2 mb-2">
+                                {event.time && (
+                                  <span className="inline-flex items-center px-2.5 py-1 bg-[#E9F0FF] text-[#2466FF] rounded-lg text-sm font-bold">
+                                    🕐 {event.time} (Київ)
+                                  </span>
+                                )}
+                                {event.timeEurope && (
+                                  <span className="inline-flex items-center px-2.5 py-1 bg-purple-50 text-purple-700 rounded-lg text-sm font-semibold">
+                                    🕐 {event.timeEurope} (Європа)
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Назва події - менший акцент */}
+                        <p className="text-base font-semibold text-gray-900 mb-2 pl-11">
+                          {event.title}
                         </p>
-                      )}
-                      {event.speaker && (
-                        <p className="text-gray-600 text-xs mt-1">
-                          Спікер: {event.speaker}
-                        </p>
-                      )}
-                      {event.notes && (
-                        <p className="text-gray-500 text-xs mt-1">
-                          ({event.notes})
-                        </p>
-                      )}
-                    </div>
-                  ))}
+
+                        {/* Додаткова інформація */}
+                        <div className="pl-11 space-y-1">
+                          {event.description && (
+                            <p className="text-sm text-gray-700">
+                              {event.description}
+                            </p>
+                          )}
+                          {event.speaker && (
+                            <p className="text-sm text-gray-600">
+                              <span className="font-medium">Спікер:</span> {event.speaker}
+                            </p>
+                          )}
+                          {event.notes && (
+                            <p className="text-xs text-gray-500 italic">
+                              {event.notes}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
