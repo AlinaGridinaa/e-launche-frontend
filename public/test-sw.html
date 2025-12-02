@@ -180,8 +180,18 @@
                 // Get VAPID key
                 log('Fetching VAPID public key...', 'info');
                 const response = await fetch(`${API_URL}/notifications/vapid-public-key`);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch VAPID key: ${response.status} ${response.statusText}`);
+                }
+                
                 const data = await response.json();
-                log(`VAPID key: ${data.publicKey.substring(0, 20)}...`, 'info');
+                
+                if (!data.publicKey) {
+                    throw new Error('VAPID public key is missing in response');
+                }
+                
+                log(`VAPID key received: ${data.publicKey.substring(0, 20)}...`, 'info');
 
                 // Subscribe
                 const registration = await navigator.serviceWorker.ready;
