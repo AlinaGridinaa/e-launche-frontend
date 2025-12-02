@@ -71,7 +71,7 @@ export default function LessonRatingModal({
           {/* Mood Rating */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
-              Настроєння після уроку:
+              Настрій після уроку:
             </label>
             <div className="flex justify-between gap-2">
               {moodEmojis.map((emoji, index) => (
@@ -94,7 +94,7 @@ export default function LessonRatingModal({
           {/* Usefulness Rating */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
-              Наскільки застосовна інформація?
+              Наскільки зрозуміла інформація?
             </label>
             <div className="flex justify-center gap-2">
               {[1, 2, 3, 4, 5].map((star) => (

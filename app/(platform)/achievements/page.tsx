@@ -232,7 +232,7 @@ export default function AchievementsPage() {
                 onClick={() => setShowSubmitModal(true)}
                 className="w-full py-4 bg-[#2466FF] text-white font-bold rounded-2xl hover:bg-[#1557ee] transition-colors"
               >
-                🔵 Отримати нагороду
+                Отримати нагороду
               </button>
             )}
           </div>

@@ -71,7 +71,7 @@ export default function LessonPage() {
           moduleNumber: module.number,
           lessonNumber: lesson.number,
           title: lesson.title,
-          description: lesson.description || 'Опис відео буде доступний незабаром',
+          description: lesson.description || '',
           videoUrl: lesson.videoUrl,
           materials: lesson.materials,
           homework: lesson.homework || '',
