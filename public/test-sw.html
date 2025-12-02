@@ -206,17 +206,27 @@
                 log(`Endpoint: ${subscription.endpoint.substring(0, 50)}...`, 'info');
                 
                 // Save to server (requires authentication)
-                // Uncomment if you have auth token
-                // const token = localStorage.getItem('token');
-                // const saveResponse = await fetch(`${API_URL}/notifications/subscribe`, {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //         'Authorization': `Bearer ${token}`
-                //     },
-                //     body: JSON.stringify(subscription.toJSON())
-                // });
-                // log('✅ Subscription saved to server!', 'success');
+                const token = localStorage.getItem('token');
+                if (token) {
+                    log('Saving subscription to server...', 'info');
+                    const saveResponse = await fetch(`${API_URL}/notifications/subscribe`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(subscription.toJSON())
+                    });
+                    
+                    if (saveResponse.ok) {
+                        log('✅ Subscription saved to server!', 'success');
+                    } else {
+                        log(`⚠️ Failed to save to server: ${saveResponse.status}`, 'error');
+                    }
+                } else {
+                    log('⚠️ No auth token found. Subscription created locally but not saved to server.', 'error');
+                    log('   Please login at the main app first, then come back here.', 'info');
+                }
                 
                 document.getElementById('subscription-status').textContent = 'Subscribed ✅';
             } catch (error) {
