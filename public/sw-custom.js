@@ -42,15 +42,22 @@ self.addEventListener('activate', (event) => {
 
 // Fetch із стратегією Network First
 self.addEventListener('fetch', (event) => {
+  // Ігноруємо не-http(s) запити (наприклад chrome-extension://)
+  if (!event.request.url.startsWith('http')) {
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Клонуємо відповідь
-        const responseToCache = response.clone();
-        
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
+        // Клонуємо відповідь тільки якщо це успішна відповідь
+        if (response && response.status === 200 && response.type === 'basic') {
+          const responseToCache = response.clone();
+          
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+        }
         
         return response;
       })
