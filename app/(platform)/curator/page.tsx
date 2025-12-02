@@ -377,7 +377,7 @@ export default function CuratorPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Коментар (опціонально)
+                  Коментар {reviewFeedback.trim() ? '(опціонально)' : ''}
                 </label>
                 <textarea
                   value={reviewFeedback}
@@ -386,6 +386,12 @@ export default function CuratorPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black resize-none"
                   placeholder="Залиште коментар для студента..."
                 />
+                {!reviewFeedback.trim() && (
+                  <p className="text-xs text-orange-600 mt-1.5 flex items-center gap-1">
+                    <span>⚠️</span>
+                    <span>Коментар обов'язковий при поверненні ДЗ на доопрацювання</span>
+                  </p>
+                )}
               </div>
 
               <div className="space-y-3 pt-4">
@@ -399,10 +405,15 @@ export default function CuratorPage() {
                   </button>
                   <button
                     onClick={handleReturnForRevision}
-                    disabled={reviewing}
-                    className="flex-1 px-4 py-3 bg-orange-500 text-white font-medium rounded-xl hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={reviewing || !reviewFeedback.trim()}
+                    className={`flex-1 px-4 py-3 text-white font-medium rounded-xl transition-colors ${
+                      !reviewFeedback.trim() 
+                        ? 'bg-gray-300 cursor-not-allowed' 
+                        : 'bg-orange-500 hover:bg-orange-600'
+                    } disabled:opacity-50`}
+                    title={!reviewFeedback.trim() ? 'Введіть коментар перед поверненням' : 'Повернути на доопрацювання'}
                   >
-                    Повернути
+                    🔄 Повернути
                   </button>
                 </div>
                 <button

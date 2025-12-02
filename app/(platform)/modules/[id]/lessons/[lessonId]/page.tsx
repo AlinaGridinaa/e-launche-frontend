@@ -682,9 +682,41 @@ export default function LessonPage() {
 
               {/* Feedback from curator */}
               {homework?.feedback && (
-                <div className="bg-[#E9F0FF] rounded-xl p-3 mb-4">
-                  <p className="text-xs font-bold text-[#2466FF] mb-1">Відгук куратора:</p>
-                  <p className="text-sm text-black leading-relaxed">{homework.feedback}</p>
+                <div className={`rounded-xl p-4 mb-4 border-2 ${
+                  homework.status === 'needs_revision' 
+                    ? 'bg-orange-50 border-orange-300' 
+                    : 'bg-[#E9F0FF] border-blue-200'
+                }`}>
+                  <div className="flex items-start gap-2 mb-2">
+                    <div className="flex-shrink-0 mt-0.5">
+                      {homework.status === 'needs_revision' ? (
+                        <span className="text-xl">⚠️</span>
+                      ) : (
+                        <span className="text-xl">💬</span>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className={`text-sm font-bold mb-1 ${
+                        homework.status === 'needs_revision' 
+                          ? 'text-orange-800' 
+                          : 'text-[#2466FF]'
+                      }`}>
+                        {homework.status === 'needs_revision' 
+                          ? 'Потрібні зміни - коментар куратора:' 
+                          : 'Відгук куратора:'}
+                      </p>
+                      <p className="text-sm text-black leading-relaxed whitespace-pre-wrap">
+                        {homework.feedback}
+                      </p>
+                    </div>
+                  </div>
+                  {homework.status === 'needs_revision' && (
+                    <div className="mt-3 pt-3 border-t border-orange-200">
+                      <p className="text-xs text-orange-700 font-medium">
+                        👇 Будь ласка, виправте відповідь нижче і відправте знову
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
 
