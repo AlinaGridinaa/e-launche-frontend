@@ -241,7 +241,7 @@ export function ScheduleModal({ isOpen, onClose }: ScheduleModalProps) {
 
                         {/* Time */}
                         {(event.time || event.timeEurope) && (
-                          <div className="text-sm font-semibold text-gray-700 mb-2">
+                          <div className="inline-block text-sm font-semibold text-[#2466FF] bg-blue-50 px-3 py-1.5 rounded-lg mb-2">
                             {event.time && event.timeEurope ? (
                               <span>{event.time} за Києвом, {event.timeEurope} за Європою</span>
                             ) : event.time ? (
@@ -348,7 +348,7 @@ export function ScheduleModal({ isOpen, onClose }: ScheduleModalProps) {
                             
                             {/* Час - простий формат */}
                             {(event.time || event.timeEurope) && (
-                              <div className="text-sm font-semibold text-gray-700 mb-2">
+                              <div className="inline-block text-sm font-semibold text-[#2466FF] bg-blue-50 px-3 py-1.5 rounded-lg mb-2">
                                 {event.time && event.timeEurope ? (
                                   <span>{event.time} за Києвом, {event.timeEurope} за Європою</span>
                                 ) : event.time ? (
