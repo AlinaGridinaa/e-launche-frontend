@@ -16,7 +16,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Академія Запусків - Платформа навчання",
-  description: "Магічна платформа навчання з геймифікацією",
+  description: "Магічна платформа навчання з геймифікацією. Навчайтеся створювати та запускати власні проєкти з досвідченими експертами.",
+  keywords: ["академія запусків", "навчання онлайн", "запуск проєктів", "геймифікація", "онлайн курси", "e-learning"],
+  authors: [{ name: "Академія Запусків" }],
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -26,6 +28,28 @@ export const metadata: Metadata = {
   icons: {
     icon: "/icons/icon-192.png",
     apple: "/icons/apple-touch-icon.png",
+  },
+  openGraph: {
+    type: "website",
+    locale: "uk_UA",
+    url: "https://e-launch.net",
+    siteName: "Академія Запусків",
+    title: "Академія Запусків - Платформа навчання",
+    description: "Магічна платформа навчання з геймифікацією. Навчайтеся створювати та запускати власні проєкти з досвідченими експертами.",
+    images: [
+      {
+        url: "/images/Banner.png",
+        width: 1200,
+        height: 630,
+        alt: "Академія Запусків",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Академія Запусків - Платформа навчання",
+    description: "Магічна платформа навчання з геймифікацією. Навчайтеся створювати та запускати власні проєкти з досвідченими експертами.",
+    images: ["/images/Banner.png"],
   },
 };
 
