@@ -96,33 +96,9 @@ export function CommunityRules() {
               )}
             </button>
             {expandedSection === 'curator' && (
-              <div className="p-4 text-sm text-gray-700 leading-relaxed space-y-2">
-                <p className="font-semibold">Спілкування з куратором:</p>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>Всі питання ставте у чат, не в особисті повідомлення</li>
-                  <li>Спілкуйтеся лише текстовими повідомленнями</li>
-                  <li>Не дзвоніть куратору</li>
-                  <li>Не відволікайте питаннями поза навчанням або в неробочий час</li>
-                </ul>
-              </div>
-            )}
-          </div>
-
-          {/* Правила загального чату */}
-          <div className="border border-gray-200 rounded-xl overflow-hidden">
-            <button
-              onClick={() => toggleSection('general')}
-              className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
-            >
-              <span className="font-semibold text-gray-900">ПРАВИЛА ЗАГАЛЬНОГО ЧАТУ 👇👇👇</span>
-              {expandedSection === 'general' ? (
-                <ChevronUp className="w-5 h-5 text-gray-600" />
-              ) : (
-                <ChevronDown className="w-5 h-5 text-gray-600" />
-              )}
-            </button>
-            {expandedSection === 'general' && (
               <div className="p-4 text-sm text-gray-700 leading-relaxed space-y-4">
+                <p className="font-bold text-gray-900 text-base">ПРАВИЛА ЗАГАЛЬНОГО ЧАТУ 👇👇👇</p>
+                
                 <p className="font-semibold">Щоб у чаті панувала комфортна, продуктивна та дружня атмосфера, тут МОЖНА:</p>
                 
                 <ul className="space-y-2">
@@ -256,8 +232,8 @@ export function CommunityRules() {
             )}
           </div>
         </div>
-      </div>
-    </div>
+          </div>
+        </div>
       )}
     </>
   );
