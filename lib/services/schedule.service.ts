@@ -7,7 +7,7 @@ export interface ScheduleEvent {
   date: string;
   time?: string;
   timeEurope?: string;
-  type: 'platform_opening' | 'live_stream' | 'module_opening' | 'zoom_meeting' | 'group_meeting';
+  type?: 'online_meeting' | 'platform_opening' | 'live_stream' | 'module_opening' | 'zoom_meeting' | 'group_meeting';
   link?: string;
   speaker?: string;
   isCompleted: boolean;

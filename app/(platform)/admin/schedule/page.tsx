@@ -15,7 +15,7 @@ export default function AdminSchedulePage() {
     date: '',
     time: '',
     timeEurope: '',
-    type: 'live_stream' as const,
+    type: '',
     link: '',
     speaker: '',
     isCompleted: false,
@@ -95,7 +95,7 @@ export default function AdminSchedulePage() {
         date: '',
         time: '',
         timeEurope: '',
-        type: 'live_stream',
+        type: '' as any,
         link: '',
         speaker: '',
         isCompleted: false,
@@ -121,6 +121,7 @@ export default function AdminSchedulePage() {
   };
 
   const eventTypeLabels = {
+    'online_meeting': 'Онлайн-зустріч',
     'live_stream': 'Прямий ефір',
     'zoom_meeting': 'Zoom-зустріч',
     'module_opening': 'Відкриття модуля',
@@ -164,9 +165,11 @@ export default function AdminSchedulePage() {
                   <div className="flex-1">
                     {/* Type Badge */}
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
-                        {eventTypeLabels[event.type as keyof typeof eventTypeLabels]}
-                      </span>
+                      {event.type && (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                          {eventTypeLabels[event.type as keyof typeof eventTypeLabels]}
+                        </span>
+                      )}
                       {event.isCompleted && (
                         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
                           ✓ Завершено
@@ -215,7 +218,7 @@ export default function AdminSchedulePage() {
                     )}
 
                     {/* Tags */}
-                    {event.tags && event.tags.length > 0 && (
+                    {/* {event.tags && event.tags.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-3">
                         {event.tags.map((tag, idx) => (
                           <span
@@ -226,7 +229,7 @@ export default function AdminSchedulePage() {
                           </span>
                         ))}
                       </div>
-                    )}
+                    )} */}
                   </div>
 
                   {/* Actions */}
@@ -285,19 +288,15 @@ export default function AdminSchedulePage() {
                 {/* Type */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Тип події *
+                    Тип події
                   </label>
                   <select
-                    required
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
                   >
-                    <option value="live_stream">Прямий ефір</option>
-                    <option value="zoom_meeting">Zoom-зустріч</option>
-                    <option value="module_opening">Відкриття модуля</option>
-                    <option value="platform_opening">Старт платформи</option>
-                    <option value="group_meeting">Групова зустріч</option>
+                    <option value="">Не обрано</option>
+                    <option value="online_meeting">Онлайн-зустріч</option>
                   </select>
                 </div>
 
