@@ -39,8 +39,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "https://e-launch.net/images/Banner.png",
-        width: 1372,
-        height: 1080,
+        width: 1200,
+        height: 630,
         alt: "Академія Запусків",
       },
     ],
@@ -50,6 +50,24 @@ export const metadata: Metadata = {
     title: "Академія Запусків - Платформа навчання",
     description: "Магічна платформа навчання з геймифікацією. Навчайтеся створювати та запускати власні проєкти з досвідченими експертами.",
     images: ["https://e-launch.net/images/Banner.png"],
+  },
+  other: {
+    'telegram:title': "Академія Запусків - Платформа навчання",
+    'telegram:description': "Магічна платформа навчання з геймифікацією. Навчайтеся створювати та запускати власні проєкти з досвідченими експертами.",
+    'telegram:image': "https://e-launch.net/images/Banner.png"
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://e-launch.net",
   },
 };
 
@@ -78,6 +96,21 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Академія Запусків" />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://e-launch.net" />
+        <meta property="og:title" content="Академія Запусків - Платформа навчання" />
+        <meta property="og:description" content="Магічна платформа навчання з геймифікацією. Навчайтеся створювати та запускати власні проєкти з досвідченими експертами." />
+        <meta property="og:image" content="https://e-launch.net/images/Banner.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        
+        {/* Telegram specific */}
+        <meta name="telegram:card" content="summary_large_image" />
+        <meta name="telegram:title" content="Академія Запусків - Платформа навчання" />
+        <meta name="telegram:description" content="Магічна платформа навчання з геймифікацією. Навчайтеся створювати та запускати власні проєкти з досвідченими експертами." />
+        <meta name="telegram:image" content="https://e-launch.net/images/Banner.png" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
