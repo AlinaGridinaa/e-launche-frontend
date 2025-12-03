@@ -12,6 +12,7 @@ export default function AdminUsersPage() {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [selectedFaculty, setSelectedFaculty] = useState<string>('');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [showAchievementModal, setShowAchievementModal] = useState(false);
   const [showCuratorModal, setShowCuratorModal] = useState(false);
   const [selectedUserForAchievement, setSelectedUserForAchievement] = useState<string | null>(null);
@@ -39,6 +40,16 @@ export default function AdminUsersPage() {
     isAdmin: false,
     isCurator: false,
   });
+  const [editUser, setEditUser] = useState<{
+    id: string;
+    email: string;
+    firstName: string;
+    phoneOrTelegram: string;
+    group: string;
+    accessUntil: string;
+    tariff: string;
+    faculty: string;
+  } | null>(null);
   const [newAchievement, setNewAchievement] = useState({
     title: '',
     description: '',
@@ -269,6 +280,66 @@ export default function AdminUsersPage() {
     } catch (error: any) {
       console.error('Failed to assign curator:', error);
       alert(error.response?.data?.message || 'Помилка призначення куратора');
+    }
+  };
+
+  const handleOpenEditModal = (user: AdminUser) => {
+    setEditUser({
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      phoneOrTelegram: user.phoneOrTelegram || '',
+      group: user.group || '',
+      accessUntil: user.accessUntil ? new Date(user.accessUntil).toISOString().split('T')[0] : '',
+      tariff: user.tariff || '',
+      faculty: user.faculty || '',
+    });
+    setShowEditModal(true);
+  };
+
+  const handleUpdateUser = async () => {
+    if (!editUser) return;
+
+    if (!editUser.email || !editUser.firstName) {
+      alert('Заповніть обов\'язкові поля');
+      return;
+    }
+
+    try {
+      setCreateLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/admin/users/${editUser.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          email: editUser.email,
+          firstName: editUser.firstName,
+          lastName: 'Студент',
+          phoneOrTelegram: editUser.phoneOrTelegram || null,
+          group: editUser.group || null,
+          accessUntil: editUser.accessUntil || null,
+          tariff: editUser.tariff || null,
+          faculty: editUser.faculty || null,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Помилка оновлення користувача');
+      }
+
+      alert('Користувача успішно оновлено! ✅');
+      setShowEditModal(false);
+      setEditUser(null);
+      loadUsers();
+    } catch (error: any) {
+      console.error('Failed to update user:', error);
+      alert(error.message || 'Помилка оновлення користувача');
+    } finally {
+      setCreateLoading(false);
     }
   };
 
@@ -533,6 +604,12 @@ export default function AdminUsersPage() {
             <div className="mt-3 pt-3 border-t border-gray-100 space-y-2">
               <div className="flex gap-3 flex-wrap">
                 <button
+                  onClick={() => handleOpenEditModal(user)}
+                  className="text-sm text-[#2466FF] hover:text-[#1557ee] font-medium transition-colors"
+                >
+                  ✏️ Редагувати
+                </button>
+                <button
                   onClick={() => handleToggleAdmin(user.id)}
                   className="text-sm text-gray-600 hover:text-[#2466FF] font-medium transition-colors"
                 >
@@ -759,6 +836,168 @@ export default function AdminUsersPage() {
                   className="flex-1 px-4 py-3 bg-[#2466FF] text-white font-medium rounded-xl hover:bg-[#1557ee] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {createLoading ? 'Створення...' : 'Створити'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модальне вікно редагування користувача */}
+      {showEditModal && editUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            {/* Header модалки */}
+            <div className="sticky top-0 bg-white px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-black">Редагувати користувача</h2>
+              <button
+                onClick={() => {
+                  setShowEditModal(false);
+                  setEditUser(null);
+                }}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+
+            {/* Форма */}
+            <div className="p-6 pb-32 space-y-4">
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={editUser.email}
+                  onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
+                  placeholder="example@gmail.com"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+                />
+              </div>
+
+              {/* Ім'я та Прізвище */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Ім'я та Прізвище <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={editUser.firstName}
+                  onChange={(e) => setEditUser({ ...editUser, firstName: e.target.value })}
+                  placeholder="Іван Іваненко"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+                />
+              </div>
+
+              {/* Телефон або Телеграм */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Номер телефону або Телеграм
+                </label>
+                <input
+                  type="text"
+                  value={editUser.phoneOrTelegram}
+                  onChange={(e) => setEditUser({ ...editUser, phoneOrTelegram: e.target.value })}
+                  placeholder="+380 XX XXX XX XX або @username"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+                />
+              </div>
+
+              {/* Група */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Група
+                </label>
+                <input
+                  type="text"
+                  value={editUser.group}
+                  onChange={(e) => setEditUser({ ...editUser, group: e.target.value })}
+                  placeholder="Наприклад: 5 потік"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+                />
+              </div>
+
+              {/* Доступ до дати */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Доступ до дати (залиште пустим для вічного доступу)
+                </label>
+                <input
+                  type="date"
+                  value={editUser.accessUntil}
+                  onChange={(e) => setEditUser({ ...editUser, accessUntil: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+                />
+                {editUser.accessUntil && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Доступ до: {new Date(editUser.accessUntil).toLocaleDateString('uk-UA')}
+                  </p>
+                )}
+                {!editUser.accessUntil && (
+                  <p className="text-xs text-green-600 mt-1">
+                    ✓ Доступ назавжди
+                  </p>
+                )}
+              </div>
+
+              {/* Тариф */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Тариф навчання
+                </label>
+                <select
+                  value={editUser.tariff}
+                  onChange={(e) => setEditUser({ ...editUser, tariff: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+                >
+                  <option value="">Виберіть тариф</option>
+                  <option value="Преміум">Преміум (доступ до 7 модулів)</option>
+                  <option value="ВІП">ВІП (доступ до 9 модулів)</option>
+                  <option value="Легенда">Легенда (доступ до всіх модулів)</option>
+                </select>
+                {editUser.tariff && (
+                  <p className="text-xs text-purple-600 mt-1">
+                    💎 {editUser.tariff === 'Преміум' ? '7 модулів' : editUser.tariff === 'ВІП' ? '9 модулів' : '10 модулів (всі)'}
+                  </p>
+                )}
+              </div>
+
+              {/* Факультет */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Факультет
+                </label>
+                <select
+                  value={editUser.faculty}
+                  onChange={(e) => setEditUser({ ...editUser, faculty: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+                >
+                  <option value="">Виберіть факультет</option>
+                  <option value="Продюсер">Продюсер</option>
+                  <option value="Експерт">Експерт</option>
+                  <option value="Досвідчений">Досвідчений</option>
+                </select>
+              </div>
+
+              {/* Кнопки */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setEditUser(null);
+                  }}
+                  className="flex-1 px-4 py-3 bg-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-300 transition-colors"
+                >
+                  Скасувати
+                </button>
+                <button
+                  onClick={handleUpdateUser}
+                  disabled={createLoading}
+                  className="flex-1 px-4 py-3 bg-[#2466FF] text-white font-medium rounded-xl hover:bg-[#1557ee] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {createLoading ? 'Збереження...' : 'Зберегти'}
                 </button>
               </div>
             </div>
