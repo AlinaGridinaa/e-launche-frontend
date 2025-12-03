@@ -12,6 +12,10 @@ interface User {
   firstName: string;
   lastName: string;
   phone?: string;
+  phoneOrTelegram?: string;
+  group?: string;
+  accessUntil?: string;
+  tariff?: string;
   avatarUrl?: string;
   faculty?: string;
   hasCompletedSorting: boolean;

@@ -24,7 +24,10 @@ export default function AdminUsersPage() {
     password: '',
     firstName: '',
     lastName: '',
-    phone: '',
+    phoneOrTelegram: '',
+    group: '',
+    accessUntil: '',
+    tariff: '',
     faculty: '',
     isAdmin: false,
     isCurator: false,
@@ -114,7 +117,10 @@ export default function AdminUsersPage() {
         password: '',
         firstName: '',
         lastName: '',
-        phone: '',
+        phoneOrTelegram: '',
+        group: '',
+        accessUntil: '',
+        tariff: '',
         faculty: '',
         isAdmin: false,
         isCurator: false,
@@ -271,8 +277,26 @@ export default function AdminUsersPage() {
                   </p>
                 )}
                 <p className="text-sm text-gray-500">{user.email}</p>
-                {user.phone && (
-                  <p className="text-sm text-gray-500">{user.phone}</p>
+                {user.phoneOrTelegram && (
+                  <p className="text-sm text-gray-500">📱 {user.phoneOrTelegram}</p>
+                )}
+                {user.group && (
+                  <p className="text-sm text-gray-500">👥 {user.group}</p>
+                )}
+                {user.tariff && (
+                  <p className="text-sm font-medium text-purple-600">
+                    💎 Тариф: {user.tariff}
+                  </p>
+                )}
+                {user.accessUntil && (
+                  <p className="text-xs text-amber-600 mt-1">
+                    🔒 Доступ до: {new Date(user.accessUntil).toLocaleDateString('uk-UA')}
+                  </p>
+                )}
+                {!user.accessUntil && user.email !== 'admin@hogwarts.com' && (
+                  <p className="text-xs text-green-600 mt-1">
+                    ✓ Доступ назавжди
+                  </p>
                 )}
               </div>
             </div>
@@ -462,18 +486,77 @@ export default function AdminUsersPage() {
                 />
               </div>
 
-              {/* Телефон */}
+              {/* Телефон або Телеграм */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Телефон
+                  Номер телефону або Телеграм
                 </label>
                 <input
-                  type="tel"
-                  value={newUser.phone}
-                  onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })}
-                  placeholder="+380 XX XXX XX XX"
+                  type="text"
+                  value={newUser.phoneOrTelegram}
+                  onChange={(e) => setNewUser({ ...newUser, phoneOrTelegram: e.target.value })}
+                  placeholder="+380 XX XXX XX XX або @username"
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
                 />
+              </div>
+
+              {/* Група */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Група
+                </label>
+                <input
+                  type="text"
+                  value={newUser.group}
+                  onChange={(e) => setNewUser({ ...newUser, group: e.target.value })}
+                  placeholder="Наприклад: 5 потік"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+                />
+              </div>
+
+              {/* Доступ до дати */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Доступ до дати (залиште пустим для вічного доступу)
+                </label>
+                <input
+                  type="date"
+                  value={newUser.accessUntil}
+                  onChange={(e) => setNewUser({ ...newUser, accessUntil: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+                />
+                {newUser.accessUntil && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Доступ до: {new Date(newUser.accessUntil).toLocaleDateString('uk-UA')}
+                  </p>
+                )}
+                {!newUser.accessUntil && (
+                  <p className="text-xs text-green-600 mt-1">
+                    ✓ Доступ назавжди
+                  </p>
+                )}
+              </div>
+
+              {/* Тариф */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Тариф навчання
+                </label>
+                <select
+                  value={newUser.tariff}
+                  onChange={(e) => setNewUser({ ...newUser, tariff: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+                >
+                  <option value="">Виберіть тариф</option>
+                  <option value="Преміум">💎 Преміум (7 модулів)</option>
+                  <option value="ВІП">👑 ВІП (9 модулів)</option>
+                  <option value="Легенда">⭐ Легенда (10 модулів)</option>
+                </select>
+                {newUser.tariff && (
+                  <p className="text-xs text-purple-600 mt-1">
+                    ✓ Обрано: {newUser.tariff}
+                  </p>
+                )}
               </div>
 
               {/* Факультет */}

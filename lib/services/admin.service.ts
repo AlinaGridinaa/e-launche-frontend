@@ -22,7 +22,10 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  phone?: string;
+  phoneOrTelegram?: string;
+  group?: string;
+  accessUntil?: string;
+  tariff?: string;
   faculty?: string;
   isAdmin: boolean;
   isCurator?: boolean;
@@ -70,9 +73,13 @@ export const adminService = {
     password: string;
     firstName: string;
     lastName: string;
-    phone?: string;
+    phoneOrTelegram?: string;
+    group?: string;
+    accessUntil?: string;
+    tariff?: string;
     faculty?: string;
     isAdmin?: boolean;
+    isCurator?: boolean;
   }): Promise<User> {
     const response = await axios.post(
       `${API_URL}/admin/users`,

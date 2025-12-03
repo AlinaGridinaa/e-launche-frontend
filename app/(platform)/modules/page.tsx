@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Search, ChevronDown, ChevronUp, Lock } from 'lucide-react';
 import { modulesService, Module as ApiModule } from '@/lib/services/modules.service';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Lesson {
   id: number;
@@ -23,6 +24,7 @@ interface Module {
 }
 
 export default function ModulesPage() {
+  const { user } = useAuth();
   const [expandedModuleId, setExpandedModuleId] = useState<string | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
@@ -151,6 +153,32 @@ export default function ModulesPage() {
             onToggle={() => toggleModule(module.id)}
           />
         ))}
+
+        {/* Tariff Info */}
+        {user && user.tariff && !user.isAdmin && !user.isCurator && (
+          <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-4 border-2 border-purple-200">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center flex-shrink-0">
+                <span className="text-xl">💎</span>
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-gray-900 mb-1">
+                  Ваш тариф: {user.tariff}
+                </h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {user.tariff === 'Преміум' && 'У вас є доступ до 7 модулів навчання'}
+                  {user.tariff === 'ВІП' && 'У вас є доступ до 9 модулів навчання'}
+                  {user.tariff === 'Легенда' && 'У вас є доступ до всіх 10 модулів навчання'}
+                </p>
+                {user.tariff !== 'Легенда' && (
+                  <p className="text-xs text-purple-600 mt-2">
+                    💡 Хочете доступ до всіх модулів? Зверніться до адміністратора
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -198,9 +226,9 @@ function ModuleCard({
           <div className="flex items-start justify-between">
             <div className="space-y-2 flex-1">
               {/* Category badge */}
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-1.5">
                 <span
-                  className={`text-xs font-bold px-2 py-1.5 rounded-full ${
+                  className={`text-xs font-bold px-2 py-1.5 rounded-full w-fit ${
                     module.isActive
                       ? 'bg-white text-black'
                       : 'bg-[#F2F2F2] text-black'
@@ -208,9 +236,14 @@ function ModuleCard({
                 >
                   {module.category}
                 </span>
-                {module.isLocked && (
+                {module.isLocked && module.unlockDate && (
                   <span className="text-xs text-gray-500">
-                    Відкриється {module.unlockDate}
+                    📅 Відкриється {module.unlockDate}
+                  </span>
+                )}
+                {module.isLocked && !module.unlockDate && (
+                  <span className="text-xs text-purple-600 font-medium">
+                    💎 Доступно на вищому тарифі
                   </span>
                 )}
               </div>
