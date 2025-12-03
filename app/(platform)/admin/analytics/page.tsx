@@ -55,7 +55,7 @@ export default function AdminAnalyticsPage() {
         const data = await response.json();
         setUsers(data.map((user: any) => ({
           id: user.id,
-          name: `${user.firstName} ${user.lastName}`,
+          name: user.firstName,
           email: user.email,
           faculty: user.faculty,
           completedLessons: user.completedLessonsCount || 0,

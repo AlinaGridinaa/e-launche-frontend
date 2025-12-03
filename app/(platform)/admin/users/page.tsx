@@ -410,7 +410,7 @@ export default function AdminUsersPage() {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="font-bold text-base text-black">
-                    {user.firstName} {user.lastName}
+                    {user.firstName}
                   </h3>
                   {user.isAdmin && (
                     <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-medium rounded-full">

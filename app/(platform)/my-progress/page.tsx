@@ -166,7 +166,7 @@ export default function MyProgressPage() {
                 {profile.avatarUrl ? (
                   <img 
                     src={getAvatarUrl(profile.avatarUrl)}
-                    alt={`${profile.firstName} ${profile.lastName}`}
+                    alt={profile.firstName}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       console.error('Avatar load error:', {
@@ -189,7 +189,7 @@ export default function MyProgressPage() {
                   <div className="flex flex-wrap gap-2 mb-3.5">
                     <div className="inline-block px-2 py-1.5 bg-white rounded-full">
                       <span className="text-xs font-bold text-black leading-[11px]">
-                        {profile.firstName} {profile.lastName}
+                        {profile.firstName}
                       </span>
                     </div>
                     {profile.faculty && (

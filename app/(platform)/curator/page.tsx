@@ -312,7 +312,7 @@ export default function CuratorPage() {
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <h3 className="font-bold text-sm text-black mb-1">
-                      {student.firstName} {student.lastName}
+                      {student.firstName}
                     </h3>
                     <p className="text-xs text-gray-600">{student.email}</p>
                     {student.faculty && (
