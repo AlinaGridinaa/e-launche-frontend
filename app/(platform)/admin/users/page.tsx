@@ -19,6 +19,13 @@ export default function AdminUsersPage() {
   const [userAchievements, setUserAchievements] = useState<Achievement[]>([]);
   const [curators, setCurators] = useState<{ id: string; name: string; email: string }[]>([]);
   const [selectedCuratorId, setSelectedCuratorId] = useState<string>('');
+  
+  // Пошук і фільтрація
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filterRole, setFilterRole] = useState<string>('all'); // all, student, curator, admin
+  const [filterFaculty, setFilterFaculty] = useState<string>('all');
+  const [filterTariff, setFilterTariff] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('name'); // name, email, tariff, modules, earnings
   const [newUser, setNewUser] = useState({
     email: '',
     password: '',
@@ -41,11 +48,56 @@ export default function AdminUsersPage() {
   const [achievementLoading, setAchievementLoading] = useState(false);
 
   const faculties = ['Продюсер', 'Експерт', 'Досвідчений'];
+  const tariffs = ['Преміум', 'ВІП', 'Легенда'];
 
   useEffect(() => {
     loadUsers();
     loadCurators();
   }, []);
+
+  // Фільтрація та сортування користувачів
+  const filteredAndSortedUsers = users
+    .filter(user => {
+      // Пошук по імені, email, telegram
+      const searchLower = searchQuery.toLowerCase();
+      const matchesSearch = 
+        user.firstName.toLowerCase().includes(searchLower) ||
+        user.lastName.toLowerCase().includes(searchLower) ||
+        user.email.toLowerCase().includes(searchLower) ||
+        (user.phoneOrTelegram?.toLowerCase().includes(searchLower) || false);
+
+      if (!matchesSearch) return false;
+
+      // Фільтр по ролі
+      if (filterRole === 'admin' && !user.isAdmin) return false;
+      if (filterRole === 'curator' && !user.isCurator) return false;
+      if (filterRole === 'student' && (user.isAdmin || user.isCurator)) return false;
+
+      // Фільтр по факультету
+      if (filterFaculty !== 'all' && user.faculty !== filterFaculty) return false;
+
+      // Фільтр по тарифу
+      if (filterTariff !== 'all' && user.tariff !== filterTariff) return false;
+
+      return true;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.firstName.localeCompare(b.firstName);
+        case 'email':
+          return a.email.localeCompare(b.email);
+        case 'tariff':
+          const tariffOrder = { 'Легенда': 3, 'ВІП': 2, 'Преміум': 1 };
+          return (tariffOrder[b.tariff as keyof typeof tariffOrder] || 0) - (tariffOrder[a.tariff as keyof typeof tariffOrder] || 0);
+        case 'modules':
+          return b.completedModulesCount - a.completedModulesCount;
+        case 'earnings':
+          return b.earnings - a.earnings;
+        default:
+          return 0;
+      }
+    });
 
   const loadUsers = async () => {
     try {
@@ -250,9 +302,109 @@ export default function AdminUsersPage() {
         </button>
       </div>
 
-      {/* Список користувачів */}
+      {/* Пошук і фільтри */}
       <div className="p-4 space-y-3">
-        {users.map(user => (
+        {/* Пошук */}
+        <div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="🔍 Пошук по імені, email, telegram..."
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black placeholder:text-gray-400"
+          />
+        </div>
+
+        {/* Фільтри */}
+        <div className="grid grid-cols-2 gap-2">
+          <select
+            value={filterRole}
+            onChange={(e) => setFilterRole(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+          >
+            <option value="all">Всі ролі</option>
+            <option value="student">Студенти</option>
+            <option value="curator">Куратори</option>
+            <option value="admin">Адміни</option>
+          </select>
+
+          <select
+            value={filterFaculty}
+            onChange={(e) => setFilterFaculty(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+          >
+            <option value="all">Всі факультети</option>
+            {faculties.map(faculty => (
+              <option key={faculty} value={faculty}>{faculty}</option>
+            ))}
+          </select>
+
+          <select
+            value={filterTariff}
+            onChange={(e) => setFilterTariff(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+          >
+            <option value="all">Всі тарифи</option>
+            {tariffs.map(tariff => (
+              <option key={tariff} value={tariff}>{tariff}</option>
+            ))}
+          </select>
+
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+          >
+            <option value="name">По імені ↑</option>
+            <option value="email">По email ↑</option>
+            <option value="tariff">По тарифу ↓</option>
+            <option value="modules">По модулях ↓</option>
+            <option value="earnings">По заробітку ↓</option>
+          </select>
+        </div>
+
+        {/* Статистика */}
+        <div className="bg-gradient-to-r from-[#2466FF] to-[#1557ee] rounded-xl p-4 text-white">
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div>
+              <div className="text-2xl font-bold">{filteredAndSortedUsers.length}</div>
+              <div className="text-xs opacity-90">Знайдено</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold">{users.length}</div>
+              <div className="text-xs opacity-90">Всього</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold">{users.filter(u => u.isCurator).length}</div>
+              <div className="text-xs opacity-90">Кураторів</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Скидання фільтрів */}
+        {(searchQuery || filterRole !== 'all' || filterFaculty !== 'all' || filterTariff !== 'all') && (
+          <button
+            onClick={() => {
+              setSearchQuery('');
+              setFilterRole('all');
+              setFilterFaculty('all');
+              setFilterTariff('all');
+            }}
+            className="w-full py-2 text-sm text-gray-600 hover:text-[#2466FF] font-medium transition-colors"
+          >
+            ✕ Скинути фільтри
+          </button>
+        )}
+      </div>
+
+      {/* Список користувачів */}
+      <div className="px-4 pb-4 space-y-3">
+        {filteredAndSortedUsers.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-400">Користувачів не знайдено</p>
+          </div>
+        ) : (
+          filteredAndSortedUsers.map(user => (
           <div key={user.id} className="bg-white rounded-2xl p-4 shadow-sm">
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1">
@@ -410,7 +562,8 @@ export default function AdminUsersPage() {
               )}
             </div>
           </div>
-        ))}
+        ))
+        )}
       </div>
 
       {/* Модальне вікно створення користувача */}
