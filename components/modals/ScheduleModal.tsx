@@ -241,10 +241,14 @@ export function ScheduleModal({ isOpen, onClose }: ScheduleModalProps) {
 
                         {/* Time */}
                         {(event.time || event.timeEurope) && (
-                          <div className="text-sm text-gray-600 mb-2">
-                            {event.timeEurope && <span>{event.timeEurope} (Європа)</span>}
-                            {event.time && event.timeEurope && <span> • </span>}
-                            {event.time && <span>{event.time} (Київ)</span>}
+                          <div className="text-sm font-semibold text-gray-700 mb-2">
+                            {event.time && event.timeEurope ? (
+                              <span>{event.time} за Києвом, {event.timeEurope} за Європою</span>
+                            ) : event.time ? (
+                              <span>{event.time} за Києвом</span>
+                            ) : (
+                              <span>{event.timeEurope} за Європою</span>
+                            )}
                           </div>
                         )}
 
@@ -326,7 +330,7 @@ export function ScheduleModal({ isOpen, onClose }: ScheduleModalProps) {
                         }`}
                       >
                         {/* Дата і час - головний акцент */}
-                        <div className="flex items-start gap-3 mb-2">
+                        <div className="flex items-start gap-3 mb-3">
                           <div className="flex-shrink-0 mt-0.5">
                             {event.isCompleted ? (
                               <span className="text-2xl">✅</span>
@@ -336,52 +340,46 @@ export function ScheduleModal({ isOpen, onClose }: ScheduleModalProps) {
                           </div>
                           <div className="flex-1">
                             {/* Дата - великим жирним */}
-                            <div className="flex items-baseline gap-2 mb-1">
-                              <span className="text-xl font-bold text-[#2466FF]">
-                                {day} {month}
-                              </span>
-                              <span className="text-sm text-gray-600">
-                                ({dayName})
+                            <div className="mb-2">
+                              <span className="text-xl font-bold text-gray-900">
+                                {day} {month} ({dayName})
                               </span>
                             </div>
                             
-                            {/* Час - виділяємо */}
+                            {/* Час - простий формат */}
                             {(event.time || event.timeEurope) && (
-                              <div className="flex flex-wrap gap-2 mb-2">
-                                {event.time && (
-                                  <span className="inline-flex items-center px-2.5 py-1 bg-[#E9F0FF] text-[#2466FF] rounded-lg text-sm font-bold">
-                                    🕐 {event.time} (Київ)
-                                  </span>
-                                )}
-                                {event.timeEurope && (
-                                  <span className="inline-flex items-center px-2.5 py-1 bg-purple-50 text-purple-700 rounded-lg text-sm font-semibold">
-                                    🕐 {event.timeEurope} (Європа)
-                                  </span>
+                              <div className="text-sm font-semibold text-gray-700 mb-2">
+                                {event.time && event.timeEurope ? (
+                                  <span>{event.time} за Києвом, {event.timeEurope} за Європою</span>
+                                ) : event.time ? (
+                                  <span>{event.time} за Києвом</span>
+                                ) : (
+                                  <span>{event.timeEurope} за Європою</span>
                                 )}
                               </div>
                             )}
                           </div>
                         </div>
 
-                        {/* Назва події - менший акцент */}
+                        {/* Назва події */}
                         <p className="text-base font-semibold text-gray-900 mb-2 pl-11">
                           {event.title}
                         </p>
 
                         {/* Додаткова інформація */}
-                        <div className="pl-11 space-y-1">
+                        <div className="pl-11 space-y-1.5">
                           {event.description && (
-                            <p className="text-sm text-gray-700">
+                            <p className="text-sm text-gray-600 leading-relaxed">
                               {event.description}
                             </p>
                           )}
                           {event.speaker && (
                             <p className="text-sm text-gray-600">
-                              <span className="font-medium">Спікер:</span> {event.speaker}
+                              <span className="font-medium text-gray-900">Спікер:</span> {event.speaker}
                             </p>
                           )}
                           {event.notes && (
-                            <p className="text-xs text-gray-500 italic">
+                            <p className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
                               {event.notes}
                             </p>
                           )}
