@@ -9,7 +9,19 @@ export default function AdminSchedulePage() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<ScheduleEvent | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    description: string;
+    date: string;
+    time: string;
+    timeEurope: string;
+    type: 'online_meeting' | 'platform_opening' | 'live_stream' | 'module_opening' | 'zoom_meeting' | 'group_meeting' | '';
+    link: string;
+    speaker: string;
+    isCompleted: boolean;
+    notes: string;
+    tags: string[];
+  }>({
     title: '',
     description: '',
     date: '',
@@ -20,7 +32,7 @@ export default function AdminSchedulePage() {
     speaker: '',
     isCompleted: false,
     notes: '',
-    tags: [] as string[],
+    tags: [],
   });
 
   useEffect(() => {
@@ -45,10 +57,15 @@ export default function AdminSchedulePage() {
     e.preventDefault();
     
     try {
+      const eventData = {
+        ...formData,
+        type: formData.type || undefined,
+      };
+      
       if (editingEvent) {
-        await scheduleService.updateEvent(editingEvent._id, formData);
+        await scheduleService.updateEvent(editingEvent._id, eventData);
       } else {
-        await scheduleService.createEvent(formData);
+        await scheduleService.createEvent(eventData);
       }
       
       await loadEvents();
