@@ -97,7 +97,7 @@ export default function AdminUsersPage() {
   };
 
   const handleCreateUser = async () => {
-    if (!newUser.email || !newUser.password || !newUser.firstName || !newUser.lastName) {
+    if (!newUser.email || !newUser.password || !newUser.firstName) {
       alert('Заповніть всі обов\'язкові поля');
       return;
     }
@@ -458,30 +458,16 @@ export default function AdminUsersPage() {
                 />
               </div>
 
-              {/* Ім'я */}
+              {/* Ім'я та Прізвище */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Ім'я <span className="text-red-500">*</span>
+                  Ім'я та Прізвище <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={newUser.firstName}
-                  onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
-                  placeholder="Іван"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
-                />
-              </div>
-
-              {/* Прізвище */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Прізвище <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={newUser.lastName}
-                  onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
-                  placeholder="Іваненко"
+                  onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value, lastName: 'Студент' })}
+                  placeholder="Іван Іваненко"
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
                 />
               </div>
