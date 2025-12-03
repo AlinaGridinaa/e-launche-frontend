@@ -32,13 +32,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "uk_UA",
-    url: "https://e-launch.net",
+    url: "https://e-launche-frontend.vercel.app",
     siteName: "Академія Запусків",
     title: "Академія Запусків - Платформа навчання",
     description: "Магічна платформа навчання з геймифікацією. Навчайтеся створювати та запускати власні проєкти з досвідченими експертами.",
     images: [
       {
-        url: "https://e-launch.net/images/Banner.png",
+        url: "https://e-launche-frontend.vercel.app/images/Banner.png",
         width: 1200,
         height: 630,
         alt: "Академія Запусків",
@@ -49,12 +49,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Академія Запусків - Платформа навчання",
     description: "Магічна платформа навчання з геймифікацією. Навчайтеся створювати та запускати власні проєкти з досвідченими експертами.",
-    images: ["https://e-launch.net/images/Banner.png"],
+    images: ["https://e-launche-frontend.vercel.app/images/Banner.png"],
   },
   other: {
     'telegram:title': "Академія Запусків - Платформа навчання",
     'telegram:description': "Магічна платформа навчання з геймифікацією. Навчайтеся створювати та запускати власні проєкти з досвідченими експертами.",
-    'telegram:image': "https://e-launch.net/images/Banner.png"
+    'telegram:image': "https://e-launche-frontend.vercel.app/images/Banner.png"
   },
   robots: {
     index: true,
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://e-launch.net",
+    canonical: "https://e-launche-frontend.vercel.app",
   },
 };
 
@@ -99,10 +99,10 @@ export default function RootLayout({
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://e-launch.net" />
+        <meta property="og:url" content="https://e-launche-frontend.vercel.app" />
         <meta property="og:title" content="Академія Запусків - Платформа навчання" />
         <meta property="og:description" content="Магічна платформа навчання з геймифікацією. Навчайтеся створювати та запускати власні проєкти з досвідченими експертами." />
-        <meta property="og:image" content="https://e-launch.net/images/Banner.png" />
+        <meta property="og:image" content="https://e-launche-frontend.vercel.app/images/Banner.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         
@@ -110,7 +110,7 @@ export default function RootLayout({
         <meta name="telegram:card" content="summary_large_image" />
         <meta name="telegram:title" content="Академія Запусків - Платформа навчання" />
         <meta name="telegram:description" content="Магічна платформа навчання з геймифікацією. Навчайтеся створювати та запускати власні проєкти з досвідченими експертами." />
-        <meta name="telegram:image" content="https://e-launch.net/images/Banner.png" />
+        <meta name="telegram:image" content="https://e-launche-frontend.vercel.app/images/Banner.png" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://e-launch.net/sitemap.xml
+Sitemap: https://e-launche-frontend.vercel.app/sitemap.xml
