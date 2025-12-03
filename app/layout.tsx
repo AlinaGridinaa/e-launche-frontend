@@ -38,9 +38,9 @@ export const metadata: Metadata = {
     description: "Магічна платформа навчання з геймифікацією. Навчайтеся створювати та запускати власні проєкти з досвідченими експертами.",
     images: [
       {
-        url: "/images/Banner.png",
-        width: 1200,
-        height: 630,
+        url: "https://e-launch.net/images/Banner.png",
+        width: 1372,
+        height: 1080,
         alt: "Академія Запусків",
       },
     ],
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Академія Запусків - Платформа навчання",
     description: "Магічна платформа навчання з геймифікацією. Навчайтеся створювати та запускати власні проєкти з досвідченими експертами.",
-    images: ["/images/Banner.png"],
+    images: ["https://e-launch.net/images/Banner.png"],
   },
 };
 
