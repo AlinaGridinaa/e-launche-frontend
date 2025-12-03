@@ -298,7 +298,7 @@ export function ScheduleModal({ isOpen, onClose }: ScheduleModalProps) {
             {/* Schedule section */}
             <div className="mt-4">
               <h2 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-200 pb-3">
-                📅 Розклад першого тижня навчання
+                🗓 Розклад першого тижня навчання
               </h2>
 
               {loading ? (
@@ -335,7 +335,7 @@ export function ScheduleModal({ isOpen, onClose }: ScheduleModalProps) {
                             {event.isCompleted ? (
                               <span className="text-2xl">✅</span>
                             ) : (
-                              <span className="text-2xl">📅</span>
+                              <span className="text-2xl">🗓</span>
                             )}
                           </div>
                           <div className="flex-1">

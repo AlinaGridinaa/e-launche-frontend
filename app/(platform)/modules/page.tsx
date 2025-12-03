@@ -238,7 +238,7 @@ function ModuleCard({
                 </span>
                 {module.isLocked && module.unlockDate && (
                   <span className="text-xs text-gray-500">
-                    📅 Відкриється {module.unlockDate}
+                    🗓 Відкриється {module.unlockDate}
                   </span>
                 )}
                 {module.isLocked && !module.unlockDate && (
