@@ -22,6 +22,7 @@ export default function AdminNotificationsPage() {
   const [url, setUrl] = useState('');
   const [sendToAll, setSendToAll] = useState(true);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     checkAdminAccess();
@@ -261,8 +262,28 @@ export default function AdminNotificationsPage() {
               <p className="text-sm text-gray-600 mb-3">
                 Виберіть користувачів ({selectedUsers.length} вибрано)
               </p>
+              
+              {/* Search */}
+              <div className="mb-3">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="🔍 Пошук по email або імені..."
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2466FF] focus:border-transparent"
+                />
+              </div>
+              
               <div className="max-h-[400px] overflow-y-auto space-y-2">
-                {users.map(user => (
+                {users
+                  .filter(user => {
+                    const searchLower = searchQuery.toLowerCase();
+                    return (
+                      user.email.toLowerCase().includes(searchLower) ||
+                      user.name.toLowerCase().includes(searchLower)
+                    );
+                  })
+                  .map(user => (
                   <button
                     key={user._id}
                     onClick={() => toggleUserSelection(user._id)}
@@ -298,6 +319,18 @@ export default function AdminNotificationsPage() {
                     </div>
                   </button>
                 ))}
+                
+                {users.filter(user => {
+                  const searchLower = searchQuery.toLowerCase();
+                  return (
+                    user.email.toLowerCase().includes(searchLower) ||
+                    user.name.toLowerCase().includes(searchLower)
+                  );
+                }).length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    <p className="text-sm">Користувачів не знайдено</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
