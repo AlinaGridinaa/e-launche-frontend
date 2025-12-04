@@ -59,7 +59,14 @@ export default function AdminNotificationsPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setUsers(data);
+        // Конвертуємо id в _id для сумісності
+        const usersWithId = data.map((user: any) => ({
+          _id: user.id || user._id,
+          name: `${user.firstName} ${user.lastName}`,
+          email: user.email,
+          faculty: user.faculty,
+        }));
+        setUsers(usersWithId);
       }
     } catch (error) {
       console.error('Failed to load users:', error);
