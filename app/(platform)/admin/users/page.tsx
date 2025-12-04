@@ -15,8 +15,11 @@ export default function AdminUsersPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAchievementModal, setShowAchievementModal] = useState(false);
   const [showCuratorModal, setShowCuratorModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [selectedUserForAchievement, setSelectedUserForAchievement] = useState<string | null>(null);
   const [selectedUserForCurator, setSelectedUserForCurator] = useState<string | null>(null);
+  const [selectedUserForPassword, setSelectedUserForPassword] = useState<{ id: string; email: string } | null>(null);
+  const [newPassword, setNewPassword] = useState('');
   const [userAchievements, setUserAchievements] = useState<Achievement[]>([]);
   const [curators, setCurators] = useState<{ id: string; name: string; email: string }[]>([]);
   const [selectedCuratorId, setSelectedCuratorId] = useState<string>('');
@@ -343,6 +346,52 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleOpenPasswordModal = (userId: string, userEmail: string) => {
+    setSelectedUserForPassword({ id: userId, email: userEmail });
+    setNewPassword('');
+    setShowPasswordModal(true);
+  };
+
+  const handleChangePassword = async () => {
+    if (!selectedUserForPassword || !newPassword) {
+      alert('Введіть новий пароль');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      alert('Пароль має бути не менше 6 символів');
+      return;
+    }
+
+    try {
+      setCreateLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/admin/users/${selectedUserForPassword.id}/password`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ password: newPassword }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Помилка зміни пароля');
+      }
+
+      alert('Пароль успішно змінено! ✅');
+      setShowPasswordModal(false);
+      setSelectedUserForPassword(null);
+      setNewPassword('');
+    } catch (error: any) {
+      console.error('Failed to change password:', error);
+      alert(error.message || 'Помилка зміни пароля');
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F5F5F5] max-w-md mx-auto flex items-center justify-center">
@@ -608,6 +657,12 @@ export default function AdminUsersPage() {
                   className="text-sm text-[#2466FF] hover:text-[#1557ee] font-medium transition-colors"
                 >
                   ✏️ Редагувати
+                </button>
+                <button
+                  onClick={() => handleOpenPasswordModal(user.id, user.email)}
+                  className="text-sm text-orange-600 hover:text-orange-700 font-medium transition-colors"
+                >
+                  🔑 Змінити пароль
                 </button>
                 <button
                   onClick={() => handleToggleAdmin(user.id)}
@@ -1188,6 +1243,73 @@ export default function AdminUsersPage() {
                     setShowCuratorModal(false);
                     setSelectedUserForCurator(null);
                     setSelectedCuratorId('');
+                  }}
+                  className="px-4 py-3 bg-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-300 transition-colors"
+                >
+                  Скасувати
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модальне вікно зміни пароля */}
+      {showPasswordModal && selectedUserForPassword && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full">
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-black">
+                Змінити пароль
+              </h2>
+              <button
+                onClick={() => {
+                  setShowPasswordModal(false);
+                  setSelectedUserForPassword(null);
+                  setNewPassword('');
+                }}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+                <p className="text-sm text-blue-800">
+                  <span className="font-semibold">Користувач:</span> {selectedUserForPassword.email}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Новий пароль <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Мінімум 6 символів"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Пароль має містити мінімум 6 символів
+                </p>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={handleChangePassword}
+                  disabled={createLoading || !newPassword}
+                  className="flex-1 px-4 py-3 bg-orange-600 text-white font-medium rounded-xl hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {createLoading ? 'Збереження...' : '🔑 Змінити пароль'}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowPasswordModal(false);
+                    setSelectedUserForPassword(null);
+                    setNewPassword('');
                   }}
                   className="px-4 py-3 bg-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-300 transition-colors"
                 >
