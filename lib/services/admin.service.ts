@@ -152,6 +152,14 @@ export const adminService = {
     return response.data;
   },
 
+  async deleteUser(userId: string): Promise<{ success: boolean; message: string }> {
+    const response = await axios.delete(
+      `${API_URL}/admin/users/${userId}`,
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
+  },
+
   // Avatar management
   async getAllAvatarLevels(): Promise<Array<{ _id: string; level: number; imageUrl: string; description?: string }>> {
     const response = await axios.get(

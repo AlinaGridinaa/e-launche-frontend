@@ -175,7 +175,16 @@ export default function AdminUsersPage() {
 
     try {
       setCreateLoading(true);
-      await adminService.createUser(newUser);
+      // Видаляємо пусті рядки перед відправкою
+      const userData = {
+        ...newUser,
+        accessUntil: newUser.accessUntil.trim() || undefined,
+        phoneOrTelegram: newUser.phoneOrTelegram.trim() || undefined,
+        group: newUser.group.trim() || undefined,
+        tariff: newUser.tariff.trim() || undefined,
+        faculty: newUser.faculty.trim() || undefined,
+      };
+      await adminService.createUser(userData);
       alert('Користувача успішно створено! ✅');
       setShowCreateModal(false);
       setNewUser({
@@ -261,6 +270,20 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleDeleteUser = async (userId: string, userEmail: string) => {
+    const confirmed = confirm(`Ви впевнені, що хочете видалити користувача ${userEmail}?\n\nЦя дія незворотна!`);
+    if (!confirmed) return;
+
+    try {
+      await adminService.deleteUser(userId);
+      alert('Користувача успішно видалено! ✅');
+      loadUsers();
+    } catch (error: any) {
+      console.error('Failed to delete user:', error);
+      alert(error.response?.data?.message || 'Помилка видалення користувача');
+    }
+  };
+
   const handleOpenCuratorAssignment = (userId: string, currentCuratorId?: string) => {
     setSelectedUserForCurator(userId);
     setSelectedCuratorId(currentCuratorId || '');
@@ -311,22 +334,37 @@ export default function AdminUsersPage() {
     try {
       setCreateLoading(true);
       const token = localStorage.getItem('token');
+      
+      // Підготовка даних - пусті рядки замінюємо на undefined
+      const updateData: any = {
+        email: editUser.email,
+        firstName: editUser.firstName,
+        lastName: 'Студент',
+      };
+      
+      if (editUser.phoneOrTelegram?.trim()) {
+        updateData.phoneOrTelegram = editUser.phoneOrTelegram.trim();
+      }
+      if (editUser.group?.trim()) {
+        updateData.group = editUser.group.trim();
+      }
+      if (editUser.accessUntil?.trim()) {
+        updateData.accessUntil = editUser.accessUntil.trim();
+      }
+      if (editUser.tariff?.trim()) {
+        updateData.tariff = editUser.tariff.trim();
+      }
+      if (editUser.faculty?.trim()) {
+        updateData.faculty = editUser.faculty.trim();
+      }
+      
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/admin/users/${editUser.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          email: editUser.email,
-          firstName: editUser.firstName,
-          lastName: 'Студент',
-          phoneOrTelegram: editUser.phoneOrTelegram || null,
-          group: editUser.group || null,
-          accessUntil: editUser.accessUntil || null,
-          tariff: editUser.tariff || null,
-          faculty: editUser.faculty || null,
-        }),
+        body: JSON.stringify(updateData),
       });
 
       if (!response.ok) {
@@ -663,6 +701,12 @@ export default function AdminUsersPage() {
                   className="text-sm text-orange-600 hover:text-orange-700 font-medium transition-colors"
                 >
                   🔑 Змінити пароль
+                </button>
+                <button
+                  onClick={() => handleDeleteUser(user.id, user.email)}
+                  className="text-sm text-red-600 hover:text-red-700 font-medium transition-colors"
+                >
+                  🗑️ Видалити
                 </button>
                 <button
                   onClick={() => handleToggleAdmin(user.id)}

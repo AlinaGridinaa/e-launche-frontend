@@ -346,9 +346,9 @@ export default function AdminNotificationsPage() {
         {/* Send Button */}
         <button
           onClick={handleSendNotification}
-          disabled={sending || !title.trim() || !message.trim()}
+          disabled={sending || !title.trim() || !message.trim() || (!sendToAll && selectedUsers.length === 0)}
           className={`w-full py-4 rounded-2xl font-semibold text-white flex items-center justify-center gap-2 transition-all ${
-            sending || !title.trim() || !message.trim()
+            sending || !title.trim() || !message.trim() || (!sendToAll && selectedUsers.length === 0)
               ? 'bg-gray-300 cursor-not-allowed'
               : 'bg-gradient-to-r from-[#2466FF] to-[#1557EE] hover:shadow-lg'
           }`}
