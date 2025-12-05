@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, ChevronDown, ChevronUp, Lock } from 'lucide-react';
+import { Search, Lock } from 'lucide-react';
 import { modulesService, Module as ApiModule } from '@/lib/services/modules.service';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -25,7 +25,6 @@ interface Module {
 
 export default function ModulesPage() {
   const { user } = useAuth();
-  const [expandedModuleId, setExpandedModuleId] = useState<string | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -83,10 +82,6 @@ export default function ModulesPage() {
 
   const totalModules = modules.length;
   const completedModules = modules.filter(m => m.lessonsCompleted === m.totalLessons && m.totalLessons > 0).length;
-
-  const toggleModule = (moduleId: string) => {
-    setExpandedModuleId(expandedModuleId === moduleId ? null : moduleId);
-  };
 
   if (loading) {
     return (
@@ -149,8 +144,6 @@ export default function ModulesPage() {
           <ModuleCard 
             key={module.id} 
             module={module}
-            isExpanded={expandedModuleId === module.id}
-            onToggle={() => toggleModule(module.id)}
           />
         ))}
 
@@ -186,21 +179,11 @@ export default function ModulesPage() {
 
 interface ModuleCardProps {
   module: Module;
-  isExpanded: boolean;
-  onToggle: () => void;
 }
 
 function ModuleCard({ 
-  module, 
-  isExpanded,
-  onToggle 
+  module
 }: ModuleCardProps) {
-  const handleArrowClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onToggle();
-  };
-
   const handleModuleClick = () => {
     if (!module.isLocked) {
       window.location.href = `/modules/${module.id}`;
@@ -258,22 +241,11 @@ function ModuleCard({
               </h3>
             </div>
 
-            {/* Lock icon or Arrow */}
-            {module.isLocked ? (
+            {/* Lock icon */}
+            {module.isLocked && (
               <div className="w-6 h-6 flex items-center justify-center">
                 <Lock className="w-5 h-5 text-gray-400" />
               </div>
-            ) : (
-              <button
-                onClick={handleArrowClick}
-                className="p-1 hover:bg-black/10 rounded-full transition-colors"
-              >
-                {isExpanded ? (
-                  <ChevronUp className={`w-5 h-5 ${module.isActive ? 'text-white' : 'text-gray-900'}`} />
-                ) : (
-                  <ChevronDown className={`w-5 h-5 ${module.isActive ? 'text-white' : 'text-gray-900'}`} />
-                )}
-              </button>
             )}
           </div>
 
@@ -289,43 +261,6 @@ function ModuleCard({
           </div>
         </div>
       </div>
-
-      {/* Lessons list */}
-      {isExpanded && module.lessons.length > 0 && (
-        <div className="bg-white">
-          {module.lessons.map((lesson, index) => (
-            <div
-              key={`${module.id}-lesson-${lesson.id}`}
-              className={`flex items-center gap-3 px-3 py-3 ${
-                index !== module.lessons.length - 1 ? 'border-b border-gray-200' : ''
-              }`}
-            >
-              {/* Lesson number badge or checkmark */}
-              {lesson.isCompleted ? (
-                <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-              ) : (
-                <div className="w-6 h-6 rounded-full bg-[#F2F2F2] flex items-center justify-center text-xs font-bold flex-shrink-0 text-black">
-                  {lesson.id}
-                </div>
-              )}
-
-              {/* Lesson title */}
-              <p className={`text-sm font-bold flex-1 leading-snug ${lesson.isCompleted ? 'text-gray-600' : 'text-black'}`}>
-                {lesson.title}
-              </p>
-
-              {/* Completed label */}
-              {lesson.isCompleted && (
-                <span className="text-xs font-medium text-green-600">✓ Пройдено</span>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
