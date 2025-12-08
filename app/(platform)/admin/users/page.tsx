@@ -29,6 +29,7 @@ export default function AdminUsersPage() {
   const [filterRole, setFilterRole] = useState<string>('all'); // all, student, curator, admin
   const [filterFaculty, setFilterFaculty] = useState<string>('all');
   const [filterTariff, setFilterTariff] = useState<string>('all');
+  const [filterCurator, setFilterCurator] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('name'); // name, email, tariff, modules, earnings
   const [newUser, setNewUser] = useState({
     email: '',
@@ -284,6 +285,64 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleExportUsers = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Будуємо query параметри на основі поточних фільтрів
+      const params = new URLSearchParams();
+      if (filterTariff !== 'all') params.append('tariff', filterTariff);
+      if (filterFaculty !== 'all') params.append('faculty', filterFaculty);
+      if (filterRole !== 'all') params.append('role', filterRole);
+      if (filterCurator !== 'all') params.append('curator', filterCurator);
+      
+      const queryString = params.toString();
+      const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/admin/users/export${queryString ? '?' + queryString : ''}`;
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Помилка експорту');
+      }
+
+      const data = await response.json();
+      
+      // Створюємо Blob з BOM для правильного відображення українських символів
+      const BOM = '\uFEFF';
+      const blob = new Blob([BOM + data.csv], { type: 'text/csv;charset=utf-8;' });
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = data.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+
+      const filterInfo = [];
+      if (filterTariff !== 'all') filterInfo.push(`Тариф: ${filterTariff}`);
+      if (filterFaculty !== 'all') filterInfo.push(`Факультет: ${filterFaculty}`);
+      if (filterRole !== 'all') filterInfo.push(`Роль: ${filterRole}`);
+      if (filterCurator !== 'all') {
+        const curator = curators.find(c => c.id === filterCurator);
+        if (curator) filterInfo.push(`Куратор: ${curator.name}`);
+      }
+      
+      const message = filterInfo.length > 0 
+        ? `✅ Експортовано ${data.totalUsers} користувачів\nФільтри: ${filterInfo.join(', ')}`
+        : `✅ Експортовано ${data.totalUsers} користувачів`;
+      
+      alert(message);
+    } catch (error) {
+      console.error('Failed to export users:', error);
+      alert('❌ Помилка експорту користувачів');
+    }
+  };
+
   const handleOpenCuratorAssignment = (userId: string, currentCuratorId?: string) => {
     setSelectedUserForCurator(userId);
     setSelectedCuratorId(currentCuratorId || '');
@@ -452,6 +511,15 @@ export default function AdminUsersPage() {
           <ChevronLeft className="w-6 h-6 text-gray-700" />
         </button>
         <h1 className="text-xl font-bold text-black flex-1">Управління користувачами</h1>
+        <button
+          onClick={handleExportUsers}
+          className="p-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors"
+          title="Експорт в CSV"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </button>
         <button
           onClick={() => setShowCreateModal(true)}
           className="p-2 bg-[#2466FF] text-white rounded-full hover:bg-[#1557ee] transition-colors"
