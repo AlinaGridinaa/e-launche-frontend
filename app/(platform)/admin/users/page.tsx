@@ -41,6 +41,7 @@ export default function AdminUsersPage() {
     accessUntil: '',
     tariff: '',
     faculty: '',
+    curatorId: '',
     isAdmin: false,
     isCurator: false,
   });
@@ -53,6 +54,7 @@ export default function AdminUsersPage() {
     accessUntil: string;
     tariff: string;
     faculty: string;
+    curatorId?: string;
   } | null>(null);
   const [newAchievement, setNewAchievement] = useState({
     title: '',
@@ -184,6 +186,7 @@ export default function AdminUsersPage() {
         group: newUser.group.trim() || undefined,
         tariff: newUser.tariff.trim() || undefined,
         faculty: newUser.faculty.trim() || undefined,
+        curatorId: newUser.curatorId.trim() || undefined,
       };
       await adminService.createUser(userData);
       alert('Користувача успішно створено! ✅');
@@ -198,6 +201,7 @@ export default function AdminUsersPage() {
         accessUntil: '',
         tariff: '',
         faculty: '',
+        curatorId: '',
         isAdmin: false,
         isCurator: false,
       });
@@ -378,6 +382,7 @@ export default function AdminUsersPage() {
       accessUntil: user.accessUntil ? new Date(user.accessUntil).toISOString().split('T')[0] : '',
       tariff: user.tariff || '',
       faculty: user.faculty || '',
+      curatorId: user.curatorId || '',
     });
     setShowEditModal(true);
   };
@@ -415,6 +420,9 @@ export default function AdminUsersPage() {
       }
       if (editUser.faculty?.trim()) {
         updateData.faculty = editUser.faculty.trim();
+      }
+      if (editUser.curatorId?.trim()) {
+        updateData.curatorId = editUser.curatorId.trim();
       }
       
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/admin/users/${editUser.id}`, {
@@ -961,6 +969,26 @@ export default function AdminUsersPage() {
                 </select>
               </div>
 
+              {/* Куратор */}
+              <div>
+                <label htmlFor="curatorId" className="block text-sm font-medium text-gray-700 mb-2">
+                  Куратор
+                </label>
+                <select
+                  id="curatorId"
+                  value={newUser.curatorId}
+                  onChange={(e) => setNewUser({ ...newUser, curatorId: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
+                >
+                  <option value="">Без куратора</option>
+                  {curators.map((curator) => (
+                    <option key={curator.id} value={curator.id}>
+                      {curator.name} ({curator.email})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               {/* Адмін */}
               <div className="flex items-center gap-3">
                 <input
@@ -1145,6 +1173,26 @@ export default function AdminUsersPage() {
                   <option value="Продюсер">Продюсер</option>
                   <option value="Експерт">Експерт</option>
                   <option value="Досвідчений">Досвідчений</option>
+                </select>
+              </div>
+
+              {/* Куратор */}
+              <div>
+                <label htmlFor="editCuratorId" className="block text-sm font-medium text-gray-700 mb-2">
+                  Куратор
+                </label>
+                <select
+                  id="editCuratorId"
+                  value={editUser.curatorId || ''}
+                  onChange={(e) => setEditUser({ ...editUser, curatorId: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none"
+                >
+                  <option value="">Без куратора</option>
+                  {curators.map((curator) => (
+                    <option key={curator.id} value={curator.id}>
+                      {curator.name} ({curator.email})
+                    </option>
+                  ))}
                 </select>
               </div>
 
