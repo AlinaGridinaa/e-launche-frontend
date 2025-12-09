@@ -17,6 +17,8 @@ export default function AchievementsPage() {
     proofLink: '',
   });
   const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     loadAchievements();
@@ -36,6 +38,39 @@ export default function AchievementsPage() {
 
   const handleAchievementClick = (achievement: UserAchievement) => {
     setSelectedAchievement(achievement);
+  };
+
+  const handleFileUpload = async (file: File) => {
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+
+      const token = localStorage.getItem('token');
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+      const response = await fetch(`${API_URL}/achievements/upload-proof`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formDataUpload,
+      });
+
+      if (!response.ok) {
+        throw new Error('Помилка завантаження файлу');
+      }
+
+      const data = await response.json();
+      setFormData({ ...formData, proofFile: data.fileUrl });
+      alert('Файл успішно завантажено! ✅');
+    } catch (error) {
+      console.error('Failed to upload file:', error);
+      alert('Помилка завантаження файлу');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -59,6 +94,7 @@ export default function AchievementsPage() {
       setShowSubmitModal(false);
       setSelectedAchievement(null);
       setFormData({ proofText: '', proofFile: '', proofLink: '' });
+      setSelectedFile(null);
       await loadAchievements();
     } catch (error: any) {
       alert(error.response?.data?.message || 'Помилка відправки заявки');
@@ -275,11 +311,38 @@ export default function AchievementsPage() {
                 />
               </div>
 
-              {/* File URL */}
+              {/* File Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <Upload className="w-4 h-4 inline mr-1" />
-                  Посилання на файл/скріншот
+                  Завантажити фото/скріншот
+                </label>
+                <input
+                  type="file"
+                  accept="image/*,.pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setSelectedFile(file);
+                      handleFileUpload(file);
+                    }
+                  }}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#2466FF] file:text-white hover:file:bg-[#1557ee]"
+                  disabled={uploading}
+                />
+                {uploading && (
+                  <p className="text-xs text-blue-600 mt-2">Завантаження файлу...</p>
+                )}
+                {formData.proofFile && (
+                  <p className="text-xs text-green-600 mt-2">✓ Файл завантажено</p>
+                )}
+              </div>
+
+              {/* Or File URL */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <LinkIcon className="w-4 h-4 inline mr-1" />
+                  Або посилання на файл/скріншот
                 </label>
                 <input
                   type="url"
@@ -287,6 +350,7 @@ export default function AchievementsPage() {
                   onChange={(e) => setFormData({ ...formData, proofFile: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
                   placeholder="https://..."
+                  disabled={uploading}
                 />
               </div>
 
