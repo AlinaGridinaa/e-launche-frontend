@@ -59,7 +59,7 @@ export function useAutoSubscribeNotifications() {
         console.error('Error during auto-subscribe:', error);
       }
     };
-
+    //
     // Чекаємо трохи після монтування компонента
     const timer = setTimeout(autoSubscribe, 1000);
     return () => clearTimeout(timer);

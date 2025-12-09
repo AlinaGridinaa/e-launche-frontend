@@ -58,8 +58,12 @@ export default function CuratorPage() {
   };
 
   const handleReviewSubmit = async () => {
-    if (!selectedHomework || reviewScore < 0 || reviewScore > 100) {
-      alert('Введіть коректну оцінку (0-100)');
+    if (!selectedHomework) {
+      return;
+    }
+
+    if (reviewScore < 0 || reviewScore > 100) {
+      alert('Оцінка має бути від 0 до 100');
       return;
     }
 
@@ -362,7 +366,7 @@ export default function CuratorPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Оцінка (0-100 балів) <span className="text-red-500">*</span>
+                  Оцінка (0-100 балів) {reviewScore > 0 && '(опціонально)'}
                 </label>
                 <input
                   type="number"
@@ -371,7 +375,7 @@ export default function CuratorPage() {
                   value={reviewScore}
                   onChange={(e) => setReviewScore(Number(e.target.value))}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
-                  placeholder="0-100"
+                  placeholder="Залиште пустим, якщо оцінка не потрібна"
                 />
               </div>
 

@@ -66,6 +66,9 @@ export default function AdminUsersPage() {
 
   const faculties = ['Продюсер', 'Експерт', 'Досвідчений'];
   const tariffs = ['Преміум', 'ВІП', 'Легенда'];
+  
+  // Отримуємо унікальні групи з користувачів
+  const groups = Array.from(new Set(users.filter(u => u.group).map(u => u.group))).sort();
 
   useEffect(() => {
     loadUsers();
@@ -893,15 +896,28 @@ export default function AdminUsersPage() {
 
               {/* Група */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="group" className="block text-sm font-medium text-gray-700 mb-2">
                   Група
                 </label>
+                <select
+                  id="group"
+                  value={newUser.group}
+                  onChange={(e) => setNewUser({ ...newUser, group: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2466FF] focus:border-transparent outline-none"
+                >
+                  <option value="">Виберіть групу або залиште пустим</option>
+                  {groups.map((group) => (
+                    <option key={group} value={group}>
+                      {group}
+                    </option>
+                  ))}
+                </select>
                 <input
                   type="text"
                   value={newUser.group}
                   onChange={(e) => setNewUser({ ...newUser, group: e.target.value })}
-                  placeholder="Наприклад: 5 потік"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+                  placeholder="Або введіть нову групу"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black mt-2"
                 />
               </div>
 
@@ -1102,15 +1118,28 @@ export default function AdminUsersPage() {
 
               {/* Група */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="editGroup" className="block text-sm font-medium text-gray-700 mb-2">
                   Група
                 </label>
+                <select
+                  id="editGroup"
+                  value={editUser.group}
+                  onChange={(e) => setEditUser({ ...editUser, group: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2466FF] focus:border-transparent outline-none"
+                >
+                  <option value="">Виберіть групу або залиште пустим</option>
+                  {groups.map((group) => (
+                    <option key={group} value={group}>
+                      {group}
+                    </option>
+                  ))}
+                </select>
                 <input
                   type="text"
                   value={editUser.group}
                   onChange={(e) => setEditUser({ ...editUser, group: e.target.value })}
-                  placeholder="Наприклад: 5 потік"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
+                  placeholder="Або введіть нову групу"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black mt-2"
                 />
               </div>
 
