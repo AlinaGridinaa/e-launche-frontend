@@ -381,7 +381,7 @@ export default function CuratorPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Коментар {reviewFeedback.trim() ? '(опціонально)' : ''}
+                  Коментар (опціонально)
                 </label>
                 <textarea
                   value={reviewFeedback}
@@ -390,12 +390,9 @@ export default function CuratorPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black resize-none"
                   placeholder="Залиште коментар для студента..."
                 />
-                {!reviewFeedback.trim() && (
-                  <p className="text-xs text-orange-600 mt-1.5 flex items-center gap-1">
-                    <span>⚠️</span>
-                    <span>Коментар обов'язковий при поверненні ДЗ на доопрацювання</span>
-                  </p>
-                )}
+                <p className="text-xs text-gray-500 mt-1.5">
+                  💡 Коментар можна додати як при прийнятті, так і при поверненні роботи
+                </p>
               </div>
 
               <div className="space-y-3 pt-4">
