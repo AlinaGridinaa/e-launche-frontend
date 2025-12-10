@@ -61,7 +61,7 @@ export default function ModulesPage() {
           title: apiModule.title,
           lessonsCompleted: completedLessons,
           totalLessons: apiModule.lessons.length,
-          isActive: apiModule.number === 1 && !apiModule.isLocked, // First unlocked module is active
+          isActive: !apiModule.isLocked, // All unlocked modules are active (blue)
           isLocked: apiModule.isLocked,
           unlockDate: apiModule.unlockDate ? new Date(apiModule.unlockDate).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' }) : undefined,
           lessons: apiModule.lessons.map(lesson => ({

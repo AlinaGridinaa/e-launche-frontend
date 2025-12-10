@@ -19,6 +19,14 @@ export function ProgramModules() {
 
   useEffect(() => {
     loadProgress();
+    
+    // Перезавантажуємо при фокусі на вікні
+    const handleFocus = () => loadProgress();
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const loadProgress = async () => {

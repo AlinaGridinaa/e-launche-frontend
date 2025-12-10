@@ -29,6 +29,17 @@ export default function MyProgressPage() {
     loadProfile();
     loadLeaderboard();
     loadUserAchievements();
+    
+    // Перезавантажуємо при фокусі на вікні
+    const handleFocus = () => {
+      loadProfile();
+      loadLeaderboard();
+    };
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const loadProfile = async () => {
