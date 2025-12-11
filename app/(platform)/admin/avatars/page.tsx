@@ -420,7 +420,7 @@ export default function AvatarsManagementPage() {
                   <button
                     onClick={() => {
                       setEditingLevel(null);
-                      setEditForm({ imageUrl: '', description: '' });
+                      setEditForm({ imageUrl: '', description: '', text: '' });
                       setSelectedFile(null);
                     }}
                     className="text-gray-400 hover:text-gray-600"
