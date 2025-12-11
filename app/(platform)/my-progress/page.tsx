@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { profileService, UserProfile, ProfileStats } from '@/lib/services/profile.service';
 import { achievementsService, UserAchievement } from '@/lib/services/achievements.service';
 import { getAvatarUrl } from '@/lib/utils/avatar';
+import { avatarService, AvatarLevel } from '@/lib/services/avatar.service';
 
 interface LeaderboardEntry {
   rank: number;
@@ -24,6 +25,7 @@ export default function MyProgressPage() {
   const [userAchievements, setUserAchievements] = useState<UserAchievement[]>([]);
   const [loading, setLoading] = useState(true);
   const [showMenu, setShowMenu] = useState(false);
+  const [currentAvatarInfo, setCurrentAvatarInfo] = useState<AvatarLevel | null>(null);
 
   useEffect(() => {
     loadProfile();
@@ -48,10 +50,17 @@ export default function MyProgressPage() {
       const data = await profileService.getProfile();
       console.log('Profile loaded:', {
         avatarUrl: data.user.avatarUrl,
-        computedUrl: getAvatarUrl(data.user.avatarUrl)
+        computedUrl: getAvatarUrl(data.user.avatarUrl),
+        avatarLevel: data.user.currentAvatarLevel
       });
       setProfile(data.user);
       setStats(data.stats);
+      
+      // Завантажуємо інформацію про поточний аватар
+      if (data.user.currentAvatarLevel !== undefined) {
+        const avatarInfo = await avatarService.getAvatarByLevel(data.user.currentAvatarLevel);
+        setCurrentAvatarInfo(avatarInfo);
+      }
     } catch (error) {
       console.error('Failed to load profile:', error);
     } finally {
@@ -195,9 +204,9 @@ export default function MyProgressPage() {
               </div>
 
               {/* Інформація */}
-              <div className="flex-1 flex flex-col justify-between">
+              <div className="flex-1 flex flex-col gap-2">
                 <div>
-                  <div className="flex flex-wrap gap-2 mb-3.5">
+                  <div className="flex flex-wrap gap-2 mb-1">
                     <div className="inline-block px-2 py-1.5 bg-white rounded-full">
                       <span className="text-xs font-bold text-black leading-[11px]">
                         {profile.firstName}
@@ -213,7 +222,7 @@ export default function MyProgressPage() {
                   </div>
 
                   <div className="mb-0">
-                    <p className="text-base font-bold text-white mb-2 leading-5">
+                    <p className="text-base font-bold text-white mb-2 ">
                       {stats.modulesCompleted}/{stats.totalModules} модулів пройдено
                     </p>
                     {/* Прогрес бар */}
@@ -232,8 +241,8 @@ export default function MyProgressPage() {
                   </div>
                 </div>
 
-                <p className="text-sm text-white/90 leading-5 mt-3">
-                  Ти поки що новачок. Проходь модулі та виконуй завдання уроків щоб стати випускником Академії запусків
+                <p className="text-sm text-white/90  mt-0">
+                  {currentAvatarInfo?.text || 'Ти поки що новачок. Проходь модулі та виконуй завдання уроків щоб стати випускником Академії запусків'}
                 </p>
               </div>
             </div>

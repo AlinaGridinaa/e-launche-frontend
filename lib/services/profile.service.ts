@@ -7,6 +7,7 @@ export interface UserProfile {
   lastName: string;
   phone?: string;
   avatarUrl?: string;
+  currentAvatarLevel?: number;
   faculty?: string;
   hasCompletedSorting: boolean;
   hasAcceptedRules: boolean;

@@ -738,7 +738,7 @@ export default function LessonPage() {
               {/* Attachments Section */}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-black mb-2">
-                  Прикріплені файли (посилання)
+                  Прикріплені посилання
                 </label>
                 
                 {/* Existing attachments */}

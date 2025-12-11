@@ -169,10 +169,10 @@ export const adminService = {
     return response.data;
   },
 
-  async setAvatarLevel(level: number, imageUrl: string, description?: string): Promise<{ level: number; imageUrl: string; description?: string }> {
+  async setAvatarLevel(level: number, imageUrl: string, description?: string, text?: string): Promise<{ level: number; imageUrl: string; description?: string; text?: string }> {
     const response = await axios.put(
       `${API_URL}/admin/avatars/${level}`,
-      { imageUrl, description },
+      { imageUrl, description, text },
       { headers: getAuthHeaders() }
     );
     return response.data;
@@ -195,11 +195,14 @@ export const adminService = {
     return response.data;
   },
 
-  async uploadAvatarImage(level: number, file: File, description?: string): Promise<{ level: number; imageUrl: string; description?: string }> {
+  async uploadAvatarImage(level: number, file: File, description?: string, text?: string): Promise<{ level: number; imageUrl: string; description?: string; text?: string }> {
     const formData = new FormData();
     formData.append('file', file);
     if (description) {
       formData.append('description', description);
+    }
+    if (text) {
+      formData.append('text', text);
     }
 
     const response = await axios.post(

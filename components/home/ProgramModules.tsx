@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 interface UserProgress {
   completedModulesCount: number;
@@ -42,11 +42,16 @@ export function ProgramModules() {
       });
 
       if (userResponse.ok) {
-        const userData = await userResponse.json();
+        const result = await userResponse.json();
+        const userData = result.user || result;
         const completedModulesCount = userData.completedModules?.length || 0;
 
         // Отримуємо загальну кількість модулів
-        const modulesResponse = await fetch(`${API_URL}/modules`);
+        const modulesResponse = await fetch(`${API_URL}/modules`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (modulesResponse.ok) {
           const modulesData = await modulesResponse.json();
           setProgress({

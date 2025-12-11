@@ -358,11 +358,31 @@ export default function CuratorPage() {
               </p>
             </div>
 
-            <div className="p-6 space-y-4">
+            <div className="p-6 space-y-4 ">
               <div className="bg-gray-50 rounded-xl p-4">
                 <p className="text-xs font-medium text-gray-600 mb-2">Відповідь студента:</p>
                 <p className="text-sm text-gray-700">{selectedHomework.answer}</p>
               </div>
+
+              {/* Прикріплені посилання */}
+              {selectedHomework.attachments && selectedHomework.attachments.length > 0 && (
+                <div className="bg-blue-50 rounded-xl p-4">
+                  <p className="text-xs font-medium text-gray-600 mb-2">Прикріплені посилання:</p>
+                  <div className="space-y-2">
+                    {selectedHomework.attachments.map((url: string, index: number) => (
+                      <a
+                        key={index}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-sm text-[#2466FF] hover:underline truncate"
+                      >
+                        {url}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -395,7 +415,7 @@ export default function CuratorPage() {
                 </p>
               </div>
 
-              <div className="space-y-3 pt-4">
+              <div className="space-y-3 pt-4 pb-12">
                 <div className="flex gap-3">
                   <button
                     onClick={handleReviewSubmit}

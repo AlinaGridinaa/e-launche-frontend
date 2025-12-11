@@ -11,6 +11,7 @@ interface AvatarLevel {
   level: number;
   imageUrl: string;
   description?: string;
+  text?: string;
 }
 
 export default function AvatarsManagementPage() {
@@ -18,7 +19,7 @@ export default function AvatarsManagementPage() {
   const [loading, setLoading] = useState(true);
   const [avatars, setAvatars] = useState<AvatarLevel[]>([]);
   const [editingLevel, setEditingLevel] = useState<number | null>(null);
-  const [editForm, setEditForm] = useState({ imageUrl: '', description: '' });
+  const [editForm, setEditForm] = useState({ imageUrl: '', description: '', text: '' });
   const [initializing, setInitializing] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -81,6 +82,7 @@ export default function AvatarsManagementPage() {
     setEditForm({
       imageUrl: avatar.imageUrl,
       description: avatar.description || '',
+      text: avatar.text || '',
     });
     setSelectedFile(null);
   };
@@ -103,11 +105,12 @@ export default function AvatarsManagementPage() {
       await adminService.uploadAvatarImage(
         level,
         selectedFile,
-        editForm.description || undefined
+        editForm.description || undefined,
+        editForm.text || undefined
       );
       await loadAvatars();
       setEditingLevel(null);
-      setEditForm({ imageUrl: '', description: '' });
+      setEditForm({ imageUrl: '', description: '', text: '' });
       setSelectedFile(null);
       alert('Аватар успішно завантажено!');
     } catch (error: any) {
@@ -130,11 +133,12 @@ export default function AvatarsManagementPage() {
       await adminService.setAvatarLevel(
         level,
         editForm.imageUrl,
-        editForm.description || undefined
+        editForm.description || undefined,
+        editForm.text || undefined
       );
       await loadAvatars();
       setEditingLevel(null);
-      setEditForm({ imageUrl: '', description: '' });
+      setEditForm({ imageUrl: '', description: '', text: '' });
     } catch (error) {
       console.error('Failed to save avatar:', error);
       alert('Помилка при збереженні аватара');
@@ -163,6 +167,7 @@ export default function AvatarsManagementPage() {
     setEditForm({
       imageUrl: `/avatars/level-${newLevel}.png`,
       description: `Аватар після ${newLevel} модуля`,
+      text: `Аватар після ${newLevel} модуля`,
     });
     setSelectedFile(null);
   };
@@ -317,6 +322,21 @@ export default function AvatarsManagementPage() {
                     />
                   </div>
 
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Текст для відображення (необов'язково)
+                    </label>
+                    <input
+                      type="text"
+                      value={editForm.text}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, text: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#2466FF] focus:border-transparent"
+                      placeholder="Аватар після 0 модуля"
+                    />
+                  </div>
+
                   <button
                     onClick={() => handleSave(avatar.level)}
                     disabled={uploading}
@@ -357,6 +377,11 @@ export default function AvatarsManagementPage() {
                         <p className="text-xs text-gray-500">
                           {avatar.description || 'Без опису'}
                         </p>
+                        {avatar.text && (
+                          <p className="text-xs text-[#2466FF] font-medium mt-1">
+                            Текст: {avatar.text}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div className="flex gap-2">
