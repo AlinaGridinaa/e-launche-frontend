@@ -46,13 +46,16 @@ export default function CuratorPage() {
   const handleAudioRecorded = async (audioBlob: Blob) => {
     try {
       setUploadingAudio(true);
+      console.log('Audio blob size:', audioBlob.size, 'bytes');
+      console.log('Audio blob type:', audioBlob.type);
       const result = await curatorService.uploadAudioFeedback(audioBlob);
       setAudioFeedbackUrl(result.audioUrl);
       setShowAudioRecorder(false);
       alert('Голосовий коментар збережено! 🎙️');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to upload audio:', error);
-      alert('Помилка завантаження аудіо');
+      console.error('Error response:', error.response?.data);
+      alert(`Помилка завантаження аудіо: ${error.response?.data?.message || error.message || 'Невідома помилка'}`);
     } finally {
       setUploadingAudio(false);
     }
