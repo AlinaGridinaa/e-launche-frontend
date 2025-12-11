@@ -406,7 +406,7 @@ export default function AdminUsersPage() {
       const updateData: any = {
         email: editUser.email,
         firstName: editUser.firstName,
-        lastName: 'Студент',
+        lastName: editUser.lastName || '',
       };
       
       if (editUser.phoneOrTelegram?.trim()) {
@@ -874,7 +874,7 @@ export default function AdminUsersPage() {
                 <input
                   type="text"
                   value={newUser.firstName}
-                  onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value, lastName: 'Студент' })}
+                  onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
                   placeholder="Іван Іваненко"
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black"
                 />
