@@ -406,7 +406,6 @@ export default function AdminUsersPage() {
       const updateData: any = {
         email: editUser.email,
         firstName: editUser.firstName,
-        lastName: editUser.lastName || '',
       };
       
       if (editUser.phoneOrTelegram?.trim()) {

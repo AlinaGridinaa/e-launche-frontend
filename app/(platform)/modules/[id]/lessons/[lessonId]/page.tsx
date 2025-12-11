@@ -705,9 +705,17 @@ export default function LessonPage() {
                           ? 'Потрібні зміни - коментар куратора:' 
                           : 'Відгук куратора:'}
                       </p>
-                      <p className="text-sm text-black leading-relaxed whitespace-pre-wrap">
-                        {homework.feedback}
-                      </p>
+                      {homework.feedback && (
+                        <p className="text-sm text-black leading-relaxed whitespace-pre-wrap mb-3">
+                          {homework.feedback}
+                        </p>
+                      )}
+                      {homework.audioFeedback && (
+                        <div className="mt-3 pt-3 border-t border-gray-200">
+                          <p className="text-xs font-medium text-gray-700 mb-2">🎙️ Голосовий коментар:</p>
+                          <audio src={homework.audioFeedback} controls className="w-full" />
+                        </div>
+                      )}
                     </div>
                   </div>
                   {homework.status === 'needs_revision' && (

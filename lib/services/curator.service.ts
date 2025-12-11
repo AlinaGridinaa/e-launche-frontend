@@ -22,6 +22,7 @@ export interface Homework {
   status: 'pending' | 'reviewed' | 'approved' | 'needs_revision';
   score?: number;
   feedback?: string;
+  audioFeedback?: string;
   submittedAt: Date;
   reviewedAt?: Date;
 }
@@ -53,14 +54,32 @@ export const curatorService = {
     return response.data;
   },
 
+  async uploadAudioFeedback(audioBlob: Blob): Promise<{ audioUrl: string }> {
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'feedback.webm');
+    
+    const response = await axios.post(
+      `${API_URL}/curator/homeworks/upload-audio`,
+      formData,
+      {
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return response.data;
+  },
+
   async reviewHomework(
     homeworkId: string,
     score: number,
-    feedback?: string
-  ): Promise<{ id: string; score: number; feedback?: string; status: string; reviewedAt: Date }> {
+    feedback?: string,
+    audioFeedback?: string
+  ): Promise<{ id: string; score: number; feedback?: string; audioFeedback?: string; status: string; reviewedAt: Date }> {
     const response = await axios.put(
       `${API_URL}/curator/homeworks/${homeworkId}/review`,
-      { score, feedback },
+      { score, feedback, audioFeedback },
       { headers: getAuthHeaders() }
     );
     return response.data;
@@ -68,11 +87,12 @@ export const curatorService = {
 
   async returnForRevision(
     homeworkId: string,
-    feedback: string
-  ): Promise<{ id: string; feedback: string; status: string; reviewedAt: Date }> {
+    feedback: string,
+    audioFeedback?: string
+  ): Promise<{ id: string; feedback: string; audioFeedback?: string; status: string; reviewedAt: Date }> {
     const response = await axios.put(
       `${API_URL}/curator/homeworks/${homeworkId}/return`,
-      { feedback },
+      { feedback, audioFeedback },
       { headers: getAuthHeaders() }
     );
     return response.data;

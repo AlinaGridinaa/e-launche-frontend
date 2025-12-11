@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, BookOpen, Users, ClipboardCheck } from 'lucide-react';
 import { curatorService, Homework, Student, CuratorModule } from '@/lib/services/curator.service';
+import AudioRecorder from '@/components/AudioRecorder';
 
 export default function CuratorPage() {
   const router = useRouter();
@@ -16,6 +17,9 @@ export default function CuratorPage() {
   const [reviewScore, setReviewScore] = useState<number>(0);
   const [reviewFeedback, setReviewFeedback] = useState<string>('');
   const [reviewing, setReviewing] = useState(false);
+  const [showAudioRecorder, setShowAudioRecorder] = useState(false);
+  const [audioFeedbackUrl, setAudioFeedbackUrl] = useState<string | null>(null);
+  const [uploadingAudio, setUploadingAudio] = useState(false);
 
   useEffect(() => {
     checkCuratorAccess();
@@ -36,6 +40,21 @@ export default function CuratorPage() {
       }
     } catch (error) {
       router.push('/login');
+    }
+  };
+
+  const handleAudioRecorded = async (audioBlob: Blob) => {
+    try {
+      setUploadingAudio(true);
+      const result = await curatorService.uploadAudioFeedback(audioBlob);
+      setAudioFeedbackUrl(result.audioUrl);
+      setShowAudioRecorder(false);
+      alert('Голосовий коментар збережено! 🎙️');
+    } catch (error) {
+      console.error('Failed to upload audio:', error);
+      alert('Помилка завантаження аудіо');
+    } finally {
+      setUploadingAudio(false);
     }
   };
 
@@ -69,18 +88,20 @@ export default function CuratorPage() {
 
     try {
       setReviewing(true);
-      await curatorService.reviewHomework(selectedHomework.id, reviewScore, reviewFeedback);
+      await curatorService.reviewHomework(selectedHomework.id, reviewScore, reviewFeedback, audioFeedbackUrl || undefined);
       
       // Оновлюємо локальний стан
       setHomeworks(homeworks.map(hw => 
         hw.id === selectedHomework.id 
-          ? { ...hw, status: 'reviewed', score: reviewScore, feedback: reviewFeedback, reviewedAt: new Date() }
+          ? { ...hw, status: 'reviewed', score: reviewScore, feedback: reviewFeedback, audioFeedback: audioFeedbackUrl || undefined, reviewedAt: new Date() }
           : hw
       ));
       
       setSelectedHomework(null);
       setReviewScore(0);
       setReviewFeedback('');
+      setAudioFeedbackUrl(null);
+      setShowAudioRecorder(false);
       alert('Оцінку виставлено успішно! ✅');
     } catch (error: any) {
       console.error('Failed to review homework:', error);
@@ -98,18 +119,20 @@ export default function CuratorPage() {
 
     try {
       setReviewing(true);
-      await curatorService.returnForRevision(selectedHomework.id, reviewFeedback);
+      await curatorService.returnForRevision(selectedHomework.id, reviewFeedback, audioFeedbackUrl || undefined);
       
       // Оновлюємо локальний стан
       setHomeworks(homeworks.map(hw => 
         hw.id === selectedHomework.id 
-          ? { ...hw, status: 'needs_revision', feedback: reviewFeedback, reviewedAt: new Date(), score: undefined }
+          ? { ...hw, status: 'needs_revision', feedback: reviewFeedback, audioFeedback: audioFeedbackUrl || undefined, reviewedAt: new Date(), score: undefined }
           : hw
       ));
       
       setSelectedHomework(null);
       setReviewScore(0);
       setReviewFeedback('');
+      setAudioFeedbackUrl(null);
+      setShowAudioRecorder(false);
       alert('Завдання повернуто на доопрацювання 🔄');
     } catch (error: any) {
       console.error('Failed to return homework:', error);
@@ -413,6 +436,50 @@ export default function CuratorPage() {
                 <p className="text-xs text-gray-500 mt-1.5">
                   💡 Коментар можна додати як при прийнятті, так і при поверненні роботи
                 </p>
+              </div>
+
+              {/* Голосовий коментар */}
+              <div>
+                {!showAudioRecorder && !audioFeedbackUrl && (
+                  <button
+                    onClick={() => setShowAudioRecorder(true)}
+                    className="w-full py-3 border-2 border-dashed border-[#2466FF] text-[#2466FF] rounded-xl hover:bg-[#2466FF]/5 transition-colors flex items-center justify-center gap-2"
+                  >
+                    🎙️ Додати голосовий коментар
+                  </button>
+                )}
+
+                {showAudioRecorder && (
+                  <AudioRecorder
+                    onAudioRecorded={handleAudioRecorded}
+                    onCancel={() => setShowAudioRecorder(false)}
+                  />
+                )}
+
+                {audioFeedbackUrl && !showAudioRecorder && (
+                  <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-green-700">✅ Голосовий коментар додано</p>
+                      <button
+                        onClick={() => {
+                          setAudioFeedbackUrl(null);
+                          setShowAudioRecorder(true);
+                        }}
+                        className="text-sm text-red-600 hover:text-red-700"
+                      >
+                        ❌ Видалити
+                      </button>
+                    </div>
+                    <audio src={audioFeedbackUrl} controls className="w-full" />
+                  </div>
+                )}
+
+                {uploadingAudio && (
+                  <div className="text-center py-4">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#2466FF]"></div>
+                    <p className="text-sm text-gray-600 mt-2">Завантаження...</p>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-3 pt-4 pb-12">

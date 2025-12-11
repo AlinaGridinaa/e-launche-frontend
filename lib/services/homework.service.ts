@@ -22,6 +22,7 @@ export interface Homework {
   status: 'pending' | 'reviewed' | 'approved' | 'needs_revision';
   score?: number;
   feedback?: string;
+  audioFeedback?: string;
   submittedAt: Date;
   reviewedAt?: Date;
 }
