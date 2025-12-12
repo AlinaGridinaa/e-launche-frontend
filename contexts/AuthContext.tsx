@@ -66,12 +66,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     setIsCheckingAuth(true);
     try {
-      const response = await authService.getCurrentUser();
+      // Додаємо timeout 5 секунд для запиту
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Auth check timeout')), 5000)
+      );
+      
+      const authPromise = authService.getCurrentUser();
+      const response = await Promise.race([authPromise, timeoutPromise]);
+      
       console.log('✅ Auth check successful:', response.user?.email);
       setUser(response.user);
     } catch (error) {
       console.log('❌ Auth check failed:', error instanceof Error ? error.message : 'Unknown error');
       setUser(null);
+      // Не кидаємо помилку, дозволяємо додатку завантажитися без автентифікації
     } finally {
       setIsLoading(false);
       setIsCheckingAuth(false);
@@ -125,13 +133,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         refreshUser,
       }}
     >
-      {children}
-      {user && user.faculty && (
-        <WelcomeModal
-          isOpen={showWelcomeModal}
-          faculty={user.faculty}
-          onClose={handleWelcomeModalClose}
-        />
+      {isLoading ? (
+        // Fallback UI поки завантажується
+        <div className="w-full h-screen bg-gradient-to-b from-[#0F1FEF] to-[#2466FF] flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-white text-lg font-medium">Завантаження...</p>
+          </div>
+        </div>
+      ) : (
+        <>
+          {children}
+          {user && user.faculty && (
+            <WelcomeModal
+              isOpen={showWelcomeModal}
+              faculty={user.faculty}
+              onClose={handleWelcomeModalClose}
+            />
+          )}
+        </>
       )}
     </AuthContext.Provider>
   );
