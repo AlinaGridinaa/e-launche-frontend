@@ -5,6 +5,7 @@ import { X, Play } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { modulesService, Module as ApiModule } from '@/lib/services/modules.service';
+import { homeworkService } from '@/lib/services/homework.service';
 
 interface Lesson {
   id: number;
@@ -13,6 +14,8 @@ interface Lesson {
   isCompleted: boolean;
   isLocked: boolean;
   videoUrl?: string;
+  homework?: string;
+  homeworkStatus?: 'pending' | 'reviewed' | 'approved' | 'needs_revision' | 'not_submitted';
 }
 
 export default function ModulePage() {
@@ -34,6 +37,29 @@ export default function ModulePage() {
       const completedLessons = data.lessons.filter(l => l.isCompleted).length;
       console.log(`✅ Progress: ${completedLessons}/${data.lessons.length} lessons completed`);
       
+      // Load homework status for each lesson
+      const lessonsWithHomework = await Promise.all(
+        data.lessons.map(async (lesson) => {
+          try {
+            const homework = await homeworkService.getMyHomework(data._id, lesson.number);
+            return {
+              number: lesson.number,
+              homeworkStatus: homework?.status || 'not_submitted',
+            };
+          } catch (error) {
+            console.log(`No homework found for lesson ${lesson.number}`);
+            return {
+              number: lesson.number,
+              homeworkStatus: 'not_submitted',
+            };
+          }
+        })
+      );
+
+      const homeworkStatusMap = Object.fromEntries(
+        lessonsWithHomework.map(h => [h.number, h.homeworkStatus])
+      );
+      
       const transformedData = {
         id: data._id,
         category: `Модуль ${data.number}`,
@@ -47,6 +73,8 @@ export default function ModulePage() {
           isCompleted: lesson.isCompleted || false,
           isLocked: false,
           videoUrl: lesson.videoUrl,
+          homework: lesson.homework,
+          homeworkStatus: homeworkStatusMap[lesson.number],
         })),
         surveyFormUrl: data.surveyFormUrl,
         surveyFormTitle: data.surveyFormTitle,
@@ -269,7 +297,7 @@ function LessonCard({
       <div className="relative -mt-[75px] mx-3 bg-white backdrop-blur-sm rounded-2xl p-3 shadow-sm">
         <div className="space-y-2">
           {/* Badges */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-wrap">
             {/* Lesson number badge */}
             <div className="inline-flex items-center bg-[#F2F2F2] rounded-full px-2 py-1.5">
               <span className="text-xs font-bold text-black">
@@ -277,7 +305,7 @@ function LessonCard({
               </span>
             </div>
 
-            {/* Status badge */}
+            {/* Lesson status badge */}
             <div
               className={`inline-flex items-center gap-1 rounded-full px-2 py-1.5 ${
                 lesson.isCompleted
@@ -298,6 +326,29 @@ function LessonCard({
                 {lesson.isCompleted ? 'Пройдено' : 'Не пройдено'}
               </span>
             </div>
+
+            {/* Homework status badge */}
+            {lesson.homework && lesson.homeworkStatus && (
+              <div
+                className={`inline-flex items-center gap-1 rounded-full px-2 py-1.5 text-xs font-bold ${
+                  lesson.homeworkStatus === 'approved'
+                    ? 'bg-green-100 text-green-700'
+                    : lesson.homeworkStatus === 'needs_revision'
+                    ? 'bg-orange-100 text-orange-700'
+                    : lesson.homeworkStatus === 'reviewed'
+                    ? 'bg-blue-100 text-blue-700'
+                    : lesson.homeworkStatus === 'pending'
+                    ? 'bg-yellow-100 text-yellow-700'
+                    : 'bg-gray-100 text-gray-700'
+                }`}
+              >
+                {lesson.homeworkStatus === 'approved' && '✓ ДЗ: Затверджено'}
+                {lesson.homeworkStatus === 'needs_revision' && '⚠ ДЗ: На доопрац.'}
+                {lesson.homeworkStatus === 'reviewed' && '→ ДЗ: Перевірено'}
+                {lesson.homeworkStatus === 'pending' && '⏳ ДЗ: Очікує'}
+                {lesson.homeworkStatus === 'not_submitted' && '○ ДЗ: Не надано'}
+              </div>
+            )}
           </div>
 
           {/* Lesson title */}
