@@ -19,6 +19,7 @@ export interface Homework {
   lessonNumber: number;
   answer: string;
   attachments: string[];
+  fileAttachments?: string[];
   status: 'pending' | 'reviewed' | 'approved' | 'needs_revision';
   score?: number;
   feedback?: string;
@@ -35,8 +36,29 @@ export interface SubmitHomeworkDto {
 }
 
 class HomeworkService {
-  async submitHomework(dto: SubmitHomeworkDto): Promise<Homework> {
-    const response = await axios.post(`${API_URL}/homework/submit`, dto);
+  async submitHomework(dto: SubmitHomeworkDto, files?: File[]): Promise<Homework> {
+    const formData = new FormData();
+    formData.append('moduleId', dto.moduleId);
+    formData.append('lessonNumber', String(dto.lessonNumber));
+    formData.append('answer', dto.answer);
+    
+    // Додаємо attachments як JSON string, бо FormData не підтримує масиви напряму
+    if (dto.attachments && dto.attachments.length > 0) {
+      formData.append('attachments', JSON.stringify(dto.attachments));
+    }
+
+    // Додаємо файли
+    if (files && files.length > 0) {
+      files.forEach((file) => {
+        formData.append('files', file);
+      });
+    }
+
+    const response = await axios.post(`${API_URL}/homework/submit`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   }
 

@@ -2,9 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  // Відключаємо Turbopack
-  turbopack: undefined,
-  
   // Додаємо headers для Open Graph зображень
   async headers() {
     return [

@@ -19,6 +19,7 @@ export interface Homework {
   lessonNumber: number;
   answer: string;
   attachments: string[];
+  fileAttachments?: string[];
   status: 'pending' | 'reviewed' | 'approved' | 'needs_revision';
   score?: number;
   feedback?: string;

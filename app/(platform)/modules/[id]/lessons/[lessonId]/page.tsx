@@ -46,6 +46,8 @@ export default function LessonPage() {
   const [homeworkAnswer, setHomeworkAnswer] = useState('');
   const [homeworkAttachments, setHomeworkAttachments] = useState<string[]>([]);
   const [attachmentInput, setAttachmentInput] = useState('');
+  const [homeworkFiles, setHomeworkFiles] = useState<File[]>([]);
+  const [homeworkFileNames, setHomeworkFileNames] = useState<string[]>([]);
   const [homeworkLoading, setHomeworkLoading] = useState(false);
   const [homeworkSubmitted, setHomeworkSubmitted] = useState(false);
 
@@ -133,10 +135,12 @@ export default function LessonPage() {
         lessonNumber,
         answer: homeworkAnswer,
         attachments: homeworkAttachments,
-      });
+      }, homeworkFiles);
       
       setHomework(result);
       setHomeworkSubmitted(true);
+      setHomeworkFiles([]);
+      setHomeworkFileNames([]);
       alert('Домашнє завдання успішно відправлено! ✅');
     } catch (error: any) {
       console.error('Failed to submit homework:', error);
@@ -155,6 +159,32 @@ export default function LessonPage() {
 
   const handleRemoveAttachment = (index: number) => {
     setHomeworkAttachments(homeworkAttachments.filter((_, i) => i !== index));
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    
+    // Перевіряємо розмір файлів (max 15MB)
+    const validFiles = files.filter(file => {
+      if (file.size > 15 * 1024 * 1024) {
+        alert(`${file.name} занадто великий (> 15MB)`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validFiles.length > 0) {
+      setHomeworkFiles([...homeworkFiles, ...validFiles]);
+      setHomeworkFileNames([...homeworkFileNames, ...validFiles.map(f => f.name)]);
+    }
+    
+    // Очищаємо input
+    e.target.value = '';
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setHomeworkFiles(homeworkFiles.filter((_, i) => i !== index));
+    setHomeworkFileNames(homeworkFileNames.filter((_, i) => i !== index));
   };
 
   const handleMarkAsCompleted = async () => {
@@ -792,6 +822,55 @@ export default function LessonPage() {
                     >
                       <Upload className="w-4 h-4 text-black" />
                     </button>
+                  </div>
+                )}
+              </div>
+
+              {/* File Attachments Section */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-black mb-2">
+                  📁 Прикріпити файли (фото, документи - до 15 МБ)
+                </label>
+                
+                {/* Existing file attachments */}
+                {homeworkFileNames.length > 0 && (
+                  <div className="space-y-2 mb-3">
+                    {homeworkFileNames.map((fileName, index) => (
+                      <div key={index} className="flex items-center gap-2 bg-green-50 rounded-lg p-2 border border-green-200">
+                        <svg className="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-sm text-green-700 flex-1 truncate">{fileName}</span>
+                        {homework?.status !== 'approved' && (
+                          <button
+                            onClick={() => handleRemoveFile(index)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* File upload input */}
+                {homework?.status !== 'approved' && (
+                  <div>
+                    <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-[#2466FF] rounded-lg cursor-pointer hover:bg-[#2466FF]/5 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <Upload className="w-4 h-4 text-[#2466FF]" />
+                        <span className="text-sm text-[#2466FF] font-medium">Завантажити файли</span>
+                      </div>
+                      <input
+                        type="file"
+                        multiple
+                        onChange={handleFileUpload}
+                        accept="image/*,.pdf,.doc,.docx"
+                        className="hidden"
+                      />
+                    </label>
+                    <p className="text-xs text-gray-500 mt-1">Максимум 5 файлів, до 15 МБ кожен</p>
                   </div>
                 )}
               </div>

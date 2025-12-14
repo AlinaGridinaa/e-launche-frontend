@@ -410,6 +410,29 @@ export default function CuratorPage() {
                 </div>
               )}
 
+              {/* Завантажені файли */}
+              {selectedHomework.fileAttachments && selectedHomework.fileAttachments.length > 0 && (
+                <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+                  <p className="text-xs font-medium text-gray-600 mb-2">📁 Завантажені файли:</p>
+                  <div className="space-y-2">
+                    {selectedHomework.fileAttachments.map((url: string, index: number) => (
+                      <a
+                        key={index}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-sm text-green-700 hover:underline truncate flex items-center gap-2"
+                      >
+                        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {url.split('/').pop() || 'Файл'}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Оцінка (0-100 балів) {reviewScore > 0 && '(опціонально)'}
