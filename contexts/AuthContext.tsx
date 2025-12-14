@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       );
       
       const authPromise = authService.getCurrentUser();
-      const response = await Promise.race([authPromise, timeoutPromise]);
+      const response = await Promise.race([authPromise, timeoutPromise]) as any;
       
       console.log('✅ Auth check successful:', response.user?.email);
       setUser(response.user);
