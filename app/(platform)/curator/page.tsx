@@ -20,6 +20,11 @@ export default function CuratorPage() {
   const [showAudioRecorder, setShowAudioRecorder] = useState(false);
   const [audioFeedbackUrl, setAudioFeedbackUrl] = useState<string | null>(null);
   const [uploadingAudio, setUploadingAudio] = useState(false);
+  
+  // Фільтрація та пошук
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'reviewed' | 'approved' | 'needs_revision'>('all');
+  const [filterStudent, setFilterStudent] = useState<string>('all');
 
   useEffect(() => {
     checkCuratorAccess();
@@ -160,6 +165,22 @@ export default function CuratorPage() {
     }
   };
 
+  // Фільтрація домашніх завдань
+  const filteredHomeworks = homeworks.filter((hw) => {
+    // Фільтр по пошуку (ім'я студента або номер модуля)
+    const matchesSearch = searchQuery === '' || 
+      hw.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      hw.moduleTitle.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Фільтр по статусу
+    const matchesStatus = filterStatus === 'all' || hw.status === filterStatus;
+    
+    // Фільтр по студенту
+    const matchesStudent = filterStudent === 'all' || hw.studentId === filterStudent;
+    
+    return matchesSearch && matchesStatus && matchesStudent;
+  });
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F5F5F5] max-w-md mx-auto flex items-center justify-center">
@@ -242,15 +263,66 @@ export default function CuratorPage() {
       </div>
 
       {/* Контент */}
-      <div className="px-4 mt-4">
+      <div className="px-4 mt-4 pb-20">
         {activeTab === 'homeworks' && (
-          <div className="space-y-3">
-            {homeworks.length === 0 ? (
+          <div className="space-y-4">
+            {/* Пошук та фільтрація */}
+            <div className="space-y-3">
+              {/* Пошук */}
+              <input
+                type="text"
+                placeholder="🔍 Пошук по студенту або модулю..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black text-sm"
+              />
+              
+              {/* Фільтри */}
+              <div className="grid grid-cols-2 gap-2">
+                {/* Фільтр по статусу */}
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value as any)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black text-sm"
+                >
+                  <option value="all">Всі статуси</option>
+                  <option value="pending">Очікує</option>
+                  <option value="reviewed">Перевірено</option>
+                  <option value="approved">Затверджено</option>
+                  <option value="needs_revision">На доопрацюванні</option>
+                </select>
+                
+                {/* Фільтр по студенту */}
+                <select
+                  value={filterStudent}
+                  onChange={(e) => setFilterStudent(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black text-sm"
+                >
+                  <option value="all">Всі студенти</option>
+                  {students.map((student) => (
+                    <option key={student.id} value={student.id}>
+                      {student.firstName} {student.lastName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              {/* Лічильник результатів */}
+              {(searchQuery || filterStatus !== 'all' || filterStudent !== 'all') && (
+                <p className="text-xs text-gray-500">
+                  Знайдено: <span className="font-bold text-gray-700">{filteredHomeworks.length}</span> завдань
+                </p>
+              )}
+            </div>
+
+            {filteredHomeworks.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-sm text-gray-500">Домашніх завдань немає</p>
+                <p className="text-sm text-gray-500">
+                  {homeworks.length === 0 ? 'Домашніх завдань немає' : 'За фільтрами нічого не знайдено'}
+                </p>
               </div>
             ) : (
-              homeworks.map((homework) => (
+              filteredHomeworks.map((homework) => (
                 <div
                   key={homework.id}
                   className="bg-white rounded-2xl p-4 shadow-sm"
