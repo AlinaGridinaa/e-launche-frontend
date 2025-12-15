@@ -164,10 +164,10 @@ export default function LessonPage() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     
-    // Перевіряємо розмір файлів (max 15MB)
+    // Перевіряємо розмір файлів (max 20MB)
     const validFiles = files.filter(file => {
-      if (file.size > 15 * 1024 * 1024) {
-        alert(`${file.name} занадто великий (> 15MB)`);
+      if (file.size > 20 * 1024 * 1024) {
+        alert(`${file.name} занадто великий (> 20MB)`);
         return false;
       }
       return true;
