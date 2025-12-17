@@ -20,6 +20,7 @@ interface Module {
   totalLessons: number;
   isActive: boolean;
   isLocked: boolean;
+  isTariffLocked?: boolean;
   unlockDate?: string;
   lessons: Lesson[];
 }
@@ -65,6 +66,7 @@ export default function ModulesPage() {
           totalLessons: apiModule.lessons.length,
           isActive: !apiModule.isLocked, // All unlocked modules are active (blue)
           isLocked: apiModule.isLocked,
+          isTariffLocked: apiModule.isTariffLocked,
           unlockDate: apiModule.unlockDate ? new Date(apiModule.unlockDate).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' }) : undefined,
           lessons: apiModule.lessons.map(lesson => ({
             id: lesson.number,
@@ -230,9 +232,14 @@ function ModuleCard({
                     🗓 Відкриється {module.unlockDate}
                   </span>
                 )}
-                {module.isLocked && !module.unlockDate && (
+                {module.isLocked && !module.unlockDate && module.isTariffLocked && (
                   <span className="text-xs text-purple-600 font-medium">
                     💎 Доступно на вищому тарифі
+                  </span>
+                )}
+                {module.isLocked && !module.unlockDate && !module.isTariffLocked && (
+                  <span className="text-xs text-gray-500 font-medium">
+                    🔒 Скоро відкриється
                   </span>
                 )}
               </div>

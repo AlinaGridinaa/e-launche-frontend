@@ -35,6 +35,7 @@ export interface Module {
   title: string;
   description: string;
   isLocked: boolean;
+  isTariffLocked?: boolean;
   unlockDate?: Date;
   lessons: Lesson[];
   progress: number;
