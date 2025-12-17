@@ -15,6 +15,7 @@ interface Module {
   id: string;
   category: string;
   title: string;
+  number: number;
   lessonsCompleted: number;
   totalLessons: number;
   isActive: boolean;
@@ -59,6 +60,7 @@ export default function ModulesPage() {
           id: apiModule._id,
           category: `Модуль ${apiModule.number}`,
           title: apiModule.title,
+          number: apiModule.number,
           lessonsCompleted: completedLessons,
           totalLessons: apiModule.lessons.length,
           isActive: !apiModule.isLocked, // All unlocked modules are active (blue)
@@ -71,6 +73,10 @@ export default function ModulesPage() {
           })),
         };
       });
+      
+      // Сортуємо модулі за номером
+      transformedModules.sort((a, b) => a.number - b.number);
+      
       setModules(transformedModules);
       console.log('✅ Modules loaded successfully');
     } catch (error) {
