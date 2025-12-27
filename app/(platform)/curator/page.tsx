@@ -660,37 +660,71 @@ export default function CuratorPage() {
               </button>
             </div>
             <div className="flex-1 overflow-hidden p-4">
-              {previewFile.includes('/image/upload/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(previewFile) ? (
-                <img 
-                  src={previewFile} 
-                  alt="Preview" 
-                  className="w-full h-full object-contain"
-                />
-              ) : (
-                <div className="w-full h-full flex flex-col">
-                  <iframe
-                    src={`https://docs.google.com/viewer?url=${encodeURIComponent(previewFile)}&embedded=true`}
-                    className="w-full flex-1 border-0 rounded-lg"
-                    title="Document preview"
-                  />
-                  <div className="mt-4 text-center">
+              {(() => {
+                const isImage = previewFile.includes('/image/upload/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(previewFile);
+                const isPdf = previewFile.toLowerCase().endsWith('.pdf') || previewFile.includes('/upload/') && !isImage;
+                
+                if (isImage) {
+                  return (
+                    <img 
+                      src={previewFile} 
+                      alt="Preview" 
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                      }}
+                    />
+                  );
+                }
+                
+                if (isPdf) {
+                  return (
+                    <iframe
+                      src={previewFile}
+                      className="w-full h-full border-0 rounded-lg min-h-[600px]"
+                      title="PDF preview"
+                    />
+                  );
+                }
+                
+                return (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-4">
+                    <svg className="w-20 h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    <p className="text-gray-600 text-center">
+                      Перегляд недоступний для цього типу файлу.<br />
+                      Завантажте файл для перегляду.
+                    </p>
                     <a
                       href={previewFile}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                      download
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
                       Завантажити файл
                     </a>
-                    <p className="text-xs text-gray-500 mt-2">
-                      Якщо перегляд не працює, скористайтесь кнопкою завантаження
-                    </p>
                   </div>
-                </div>
-              )}
+                );
+              })()}
+              <div className="hidden mt-4 flex flex-col items-center justify-center gap-4">
+                <p className="text-red-600 text-center">
+                  ❌ Не вдалося завантажити зображення
+                </p>
+                <a
+                  href={previewFile}
+                  download
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Завантажити файл
+                </a>
+              </div>
             </div>
           </div>
         </div>
