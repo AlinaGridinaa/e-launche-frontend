@@ -22,6 +22,7 @@ export default function CuratorPage() {
   const [uploadingAudio, setUploadingAudio] = useState(false);
   const [previewFile, setPreviewFile] = useState<string | null>(null);
   const [previewBlob, setPreviewBlob] = useState<string | null>(null);
+  const [previewFileType, setPreviewFileType] = useState<string>('');
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const [previewError, setPreviewError] = useState(false);
   
@@ -40,6 +41,7 @@ export default function CuratorPage() {
     if (!previewFile && previewBlob) {
       URL.revokeObjectURL(previewBlob);
       setPreviewBlob(null);
+      setPreviewFileType('');
     }
   }, [previewFile]);
 
@@ -54,6 +56,7 @@ export default function CuratorPage() {
     setIsLoadingPreview(true);
     setPreviewError(false);
     setPreviewBlob(null);
+    setPreviewFileType('');
 
     try {
       const response = await fetch(url);
@@ -63,6 +66,8 @@ export default function CuratorPage() {
       const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
       setPreviewBlob(blobUrl);
+      setPreviewFileType(blob.type);
+      console.log('Loaded file type:', blob.type);
     } catch (error) {
       console.error('Error loading file:', error);
       setPreviewError(true);
@@ -730,8 +735,8 @@ export default function CuratorPage() {
                 </div>
               ) : previewBlob ? (
                 (() => {
-                  const isImage = previewFile!.includes('/image/upload/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(previewFile!);
-                  const isPdf = previewFile!.toLowerCase().endsWith('.pdf');
+                  const isImage = previewFileType.startsWith('image/');
+                  const isPdf = previewFileType === 'application/pdf';
                   
                   if (isImage) {
                     return (
@@ -762,7 +767,7 @@ export default function CuratorPage() {
                       </svg>
                       <p className="text-gray-600 text-center">
                         Перегляд недоступний для цього типу файлу.<br />
-                        Завантажте файл для перегляду.
+                        Тип: {previewFileType || 'невідомий'}
                       </p>
                       <a
                         href={previewFile!}
