@@ -21,6 +21,9 @@ export default function CuratorPage() {
   const [audioFeedbackUrl, setAudioFeedbackUrl] = useState<string | null>(null);
   const [uploadingAudio, setUploadingAudio] = useState(false);
   const [previewFile, setPreviewFile] = useState<string | null>(null);
+  const [previewBlob, setPreviewBlob] = useState<string | null>(null);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+  const [previewError, setPreviewError] = useState(false);
   
   // Фільтрація та пошук
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -31,6 +34,42 @@ export default function CuratorPage() {
     checkCuratorAccess();
     loadData();
   }, []);
+
+  // Cleanup blob URL when preview closes
+  useEffect(() => {
+    if (!previewFile && previewBlob) {
+      URL.revokeObjectURL(previewBlob);
+      setPreviewBlob(null);
+    }
+  }, [previewFile]);
+
+  // Load file as blob when preview opens
+  useEffect(() => {
+    if (previewFile) {
+      loadFileAsBlob(previewFile);
+    }
+  }, [previewFile]);
+
+  const loadFileAsBlob = async (url: string) => {
+    setIsLoadingPreview(true);
+    setPreviewError(false);
+    setPreviewBlob(null);
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch file');
+      }
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      setPreviewBlob(blobUrl);
+    } catch (error) {
+      console.error('Error loading file:', error);
+      setPreviewError(true);
+    } finally {
+      setIsLoadingPreview(false);
+    }
+  };
 
   const checkCuratorAccess = () => {
     const token = localStorage.getItem('token');
@@ -660,71 +699,85 @@ export default function CuratorPage() {
               </button>
             </div>
             <div className="flex-1 overflow-hidden p-4">
-              {(() => {
-                const isImage = previewFile.includes('/image/upload/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(previewFile);
-                const isPdf = previewFile.toLowerCase().endsWith('.pdf') || previewFile.includes('/upload/') && !isImage;
-                
-                if (isImage) {
-                  return (
-                    <img 
-                      src={previewFile} 
-                      alt="Preview" 
-                      className="w-full h-full object-contain"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                      }}
-                    />
-                  );
-                }
-                
-                if (isPdf) {
-                  return (
-                    <iframe
-                      src={previewFile}
-                      className="w-full h-full border-0 rounded-lg min-h-[600px]"
-                      title="PDF preview"
-                    />
-                  );
-                }
-                
-                return (
-                  <div className="w-full h-full flex flex-col items-center justify-center gap-4">
-                    <svg className="w-20 h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                    <p className="text-gray-600 text-center">
-                      Перегляд недоступний для цього типу файлу.<br />
-                      Завантажте файл для перегляду.
-                    </p>
-                    <a
-                      href={previewFile}
-                      download
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
-                      Завантажити файл
-                    </a>
+              {isLoadingPreview ? (
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                    <p className="text-gray-600">Завантаження файлу...</p>
                   </div>
-                );
-              })()}
-              <div className="hidden mt-4 flex flex-col items-center justify-center gap-4">
-                <p className="text-red-600 text-center">
-                  ❌ Не вдалося завантажити зображення
-                </p>
-                <a
-                  href={previewFile}
-                  download
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </div>
+              ) : previewError ? (
+                <div className="w-full h-full flex flex-col items-center justify-center gap-4">
+                  <svg className="w-20 h-20 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  Завантажити файл
-                </a>
-              </div>
+                  <p className="text-red-600 text-center font-medium">
+                    ❌ Не вдалося завантажити файл
+                  </p>
+                  <p className="text-gray-500 text-sm text-center">
+                    Спробуйте завантажити файл напряму
+                  </p>
+                  <a
+                    href={previewFile!}
+                    download
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Завантажити файл
+                  </a>
+                </div>
+              ) : previewBlob ? (
+                (() => {
+                  const isImage = previewFile!.includes('/image/upload/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(previewFile!);
+                  const isPdf = previewFile!.toLowerCase().endsWith('.pdf');
+                  
+                  if (isImage) {
+                    return (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <img 
+                          src={previewBlob} 
+                          alt="Preview" 
+                          className="max-w-full max-h-full object-contain"
+                        />
+                      </div>
+                    );
+                  }
+                  
+                  if (isPdf) {
+                    return (
+                      <iframe
+                        src={previewBlob}
+                        className="w-full h-full border-0 rounded-lg min-h-[600px]"
+                        title="PDF preview"
+                      />
+                    );
+                  }
+                  
+                  return (
+                    <div className="w-full h-full flex flex-col items-center justify-center gap-4">
+                      <svg className="w-20 h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                      <p className="text-gray-600 text-center">
+                        Перегляд недоступний для цього типу файлу.<br />
+                        Завантажте файл для перегляду.
+                      </p>
+                      <a
+                        href={previewFile!}
+                        download
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Завантажити файл
+                      </a>
+                    </div>
+                  );
+                })()
+              ) : null}
             </div>
           </div>
         </div>
