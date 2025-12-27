@@ -20,6 +20,7 @@ export default function CuratorPage() {
   const [showAudioRecorder, setShowAudioRecorder] = useState(false);
   const [audioFeedbackUrl, setAudioFeedbackUrl] = useState<string | null>(null);
   const [uploadingAudio, setUploadingAudio] = useState(false);
+  const [previewFile, setPreviewFile] = useState<string | null>(null);
   
   // Фільтрація та пошук
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -489,26 +490,14 @@ export default function CuratorPage() {
                   <div className="grid grid-cols-2 gap-2">
                     {selectedHomework.fileAttachments.map((url: string, index: number) => {
                       const fileName = url.split('/').pop() || 'Файл';
-                      // Cloudinary зображення мають /image/upload/ в URL
                       const isImage = url.includes('/image/upload/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
-                      
-                      // Модифікуємо URL для inline відображення замість завантаження
-                      let viewUrl = url;
-                      if (url.includes('cloudinary.com')) {
-                        // Додаємо fl_attachment:false для показу замість завантаження
-                        if (url.includes('/upload/')) {
-                          viewUrl = url.replace('/upload/', '/upload/fl_attachment:false/');
-                        }
-                      }
                       
                       return (
                         <div key={index} className="relative group">
                           {isImage ? (
-                            <a
-                              href={viewUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="block rounded-lg overflow-hidden border-2 border-green-200 hover:border-green-400 transition-colors"
+                            <button
+                              onClick={() => setPreviewFile(url)}
+                              className="block rounded-lg overflow-hidden border-2 border-green-200 hover:border-green-400 transition-colors w-full"
                             >
                               <img 
                                 src={url} 
@@ -520,20 +509,18 @@ export default function CuratorPage() {
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                                 </svg>
                               </div>
-                            </a>
+                            </button>
                           ) : (
-                            <a
-                              href={viewUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex flex-col items-center justify-center gap-1 p-3 rounded-lg border-2 border-green-200 hover:border-green-400 transition-colors bg-white h-32"
+                            <button
+                              onClick={() => setPreviewFile(url)}
+                              className="flex flex-col items-center justify-center gap-1 p-3 rounded-lg border-2 border-green-200 hover:border-green-400 transition-colors bg-white h-32 w-full"
                             >
                               <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                               </svg>
                               <span className="text-xs text-green-700 text-center truncate w-full px-1">{fileName.length > 15 ? fileName.slice(0, 12) + '...' : fileName}</span>
-                              <span className="text-xs text-green-600 font-medium">📥 Відкрити</span>
-                            </a>
+                              <span className="text-xs text-green-600 font-medium">👁️ Переглянути</span>
+                            </button>
                           )}
                         </div>
                       );
@@ -646,6 +633,64 @@ export default function CuratorPage() {
                   Скасувати
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модальне вікно для перегляду файлів */}
+      {previewFile && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={() => setPreviewFile(null)}
+        >
+          <div 
+            className="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center p-4 border-b">
+              <h3 className="text-lg font-semibold text-gray-900">Перегляд файлу</h3>
+              <button
+                onClick={() => setPreviewFile(null)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden p-4">
+              {previewFile.includes('/image/upload/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(previewFile) ? (
+                <img 
+                  src={previewFile} 
+                  alt="Preview" 
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col">
+                  <iframe
+                    src={`https://docs.google.com/viewer?url=${encodeURIComponent(previewFile)}&embedded=true`}
+                    className="w-full flex-1 border-0 rounded-lg"
+                    title="Document preview"
+                  />
+                  <div className="mt-4 text-center">
+                    <a
+                      href={previewFile}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      Завантажити файл
+                    </a>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Якщо перегляд не працює, скористайтесь кнопкою завантаження
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
