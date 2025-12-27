@@ -52,6 +52,44 @@ export default function CuratorPage() {
     }
   }, [previewFile]);
 
+  const detectFileTypeFromMagicBytes = async (blob: Blob): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const arr = new Uint8Array(reader.result as ArrayBuffer);
+        
+        // Перевіряємо magic bytes (file signature)
+        if (arr.length >= 4) {
+          // PNG: 89 50 4E 47
+          if (arr[0] === 0x89 && arr[1] === 0x50 && arr[2] === 0x4E && arr[3] === 0x47) {
+            return resolve('image/png');
+          }
+          // JPEG: FF D8 FF
+          if (arr[0] === 0xFF && arr[1] === 0xD8 && arr[2] === 0xFF) {
+            return resolve('image/jpeg');
+          }
+          // GIF: 47 49 46 38
+          if (arr[0] === 0x47 && arr[1] === 0x49 && arr[2] === 0x46 && arr[3] === 0x38) {
+            return resolve('image/gif');
+          }
+          // WEBP: 52 49 46 46 ... 57 45 42 50
+          if (arr[0] === 0x52 && arr[1] === 0x49 && arr[2] === 0x46 && arr[3] === 0x46) {
+            if (arr.length >= 12 && arr[8] === 0x57 && arr[9] === 0x45 && arr[10] === 0x42 && arr[11] === 0x50) {
+              return resolve('image/webp');
+            }
+          }
+          // PDF: 25 50 44 46
+          if (arr[0] === 0x25 && arr[1] === 0x50 && arr[2] === 0x44 && arr[3] === 0x46) {
+            return resolve('application/pdf');
+          }
+        }
+        
+        resolve('application/octet-stream');
+      };
+      reader.readAsArrayBuffer(blob.slice(0, 12));
+    });
+  };
+
   const loadFileAsBlob = async (url: string) => {
     setIsLoadingPreview(true);
     setPreviewError(false);
@@ -65,29 +103,41 @@ export default function CuratorPage() {
       }
       const blob = await response.blob();
       
-      // Визначаємо тип файлу за розширенням, якщо blob.type невідомий
+      // Визначаємо тип файлу за пріоритетом:
+      // 1. Magic bytes (для старих файлів без розширень)
+      // 2. Розширення з URL
+      // 3. Blob type з серверу
       let fileType = blob.type;
+      
       if (!fileType || fileType === 'application/octet-stream') {
-        const extension = url.split('.').pop()?.toLowerCase();
-        const mimeTypes: Record<string, string> = {
-          'jpg': 'image/jpeg',
-          'jpeg': 'image/jpeg',
-          'png': 'image/png',
-          'gif': 'image/gif',
-          'webp': 'image/webp',
-          'pdf': 'application/pdf',
-          'doc': 'application/msword',
-          'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        };
-        fileType = mimeTypes[extension || ''] || 'application/octet-stream';
+        // Спочатку перевіряємо magic bytes
+        const detectedType = await detectFileTypeFromMagicBytes(blob);
+        
+        if (detectedType !== 'application/octet-stream') {
+          fileType = detectedType;
+        } else {
+          // Якщо не вдалося визначити за magic bytes, пробуємо за розширенням
+          const extension = url.split('.').pop()?.toLowerCase();
+          const mimeTypes: Record<string, string> = {
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'png': 'image/png',
+            'gif': 'image/gif',
+            'webp': 'image/webp',
+            'pdf': 'application/pdf',
+            'doc': 'application/msword',
+            'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+          };
+          fileType = mimeTypes[extension || ''] || 'application/octet-stream';
+        }
       }
       
       const blobUrl = URL.createObjectURL(blob);
       setPreviewBlob(blobUrl);
       setPreviewFileType(fileType);
       console.log('URL:', url);
-      console.log('Blob type:', blob.type);
-      console.log('Detected type:', fileType);
+      console.log('Original blob type:', blob.type);
+      console.log('Detected file type:', fileType);
     } catch (error) {
       console.error('Error loading file:', error);
       setPreviewError(true);
