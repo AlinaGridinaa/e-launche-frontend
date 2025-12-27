@@ -562,17 +562,17 @@ export default function CuratorPage() {
 
       {/* Модальне вікно оцінювання */}
       {selectedHomework && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white px-6 py-4 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-black">Оцінити завдання</h2>
-              <p className="text-sm text-gray-600 mt-1">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+              <h2 className="text-lg sm:text-xl font-bold text-black">Оцінити завдання</h2>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
                 {selectedHomework.studentName} - Модуль {selectedHomework.moduleNumber}, Урок {selectedHomework.lessonNumber}
               </p>
             </div>
 
-            <div className="p-6 space-y-4 ">
-              <div className="bg-gray-50 rounded-xl p-4">
+            <div className="p-4 sm:p-6 space-y-4 pb-safe">
+              <div className="bg-gray-50 rounded-xl p-3 sm:p-4">
                 <p className="text-xs font-medium text-gray-600 mb-2">Відповідь студента:</p>
                 <p className="text-sm text-gray-700">{selectedHomework.answer}</p>
               </div>
@@ -599,7 +599,7 @@ export default function CuratorPage() {
 
               {/* Завантажені файли */}
               {selectedHomework.fileAttachments && selectedHomework.fileAttachments.length > 0 && (
-                <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+                <div className="bg-green-50 rounded-xl p-3 sm:p-4 border border-green-200">
                   <p className="text-xs font-medium text-gray-600 mb-2">📁 Завантажені файли:</p>
                   <div className="grid grid-cols-2 gap-2">
                     {selectedHomework.fileAttachments.map((url: string, index: number) => {
@@ -611,15 +611,15 @@ export default function CuratorPage() {
                           {isImage ? (
                             <button
                               onClick={() => setPreviewFile(url)}
-                              className="block rounded-lg overflow-hidden border-2 border-green-200 hover:border-green-400 transition-colors w-full"
+                              className="block rounded-lg overflow-hidden border-2 border-green-200 hover:border-green-400 active:border-green-500 transition-colors w-full"
                             >
                               <img 
                                 src={url} 
                                 alt={fileName}
-                                className="w-full h-32 object-cover"
+                                className="w-full h-24 sm:h-32 object-cover"
                               />
                               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                <svg className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                                 </svg>
                               </div>
@@ -627,13 +627,13 @@ export default function CuratorPage() {
                           ) : (
                             <button
                               onClick={() => setPreviewFile(url)}
-                              className="flex flex-col items-center justify-center gap-1 p-3 rounded-lg border-2 border-green-200 hover:border-green-400 transition-colors bg-white h-32 w-full"
+                              className="flex flex-col items-center justify-center gap-1 p-2 sm:p-3 rounded-lg border-2 border-green-200 hover:border-green-400 active:border-green-500 transition-colors bg-white h-24 sm:h-32 w-full"
                             >
-                              <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                               </svg>
-                              <span className="text-xs text-green-700 text-center truncate w-full px-1">{fileName.length > 15 ? fileName.slice(0, 12) + '...' : fileName}</span>
-                              <span className="text-xs text-green-600 font-medium">👁️ Переглянути</span>
+                              <span className="text-[10px] sm:text-xs text-green-700 text-center truncate w-full px-1">{fileName.length > 12 ? fileName.slice(0, 9) + '...' : fileName}</span>
+                              <span className="text-[10px] sm:text-xs text-green-600 font-medium">👁️ Переглянути</span>
                             </button>
                           )}
                         </div>
@@ -718,19 +718,19 @@ export default function CuratorPage() {
                 )}
               </div>
 
-              <div className="space-y-3 pt-4 pb-12">
-                <div className="flex gap-3">
+              <div className="space-y-3 pt-4 pb-4 sm:pb-12">
+                <div className="flex gap-2 sm:gap-3">
                   <button
                     onClick={handleReviewSubmit}
                     disabled={reviewing}
-                    className="flex-1 px-4 py-3 bg-[#2466FF] text-white font-medium rounded-xl hover:bg-[#1557ee] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base bg-[#2466FF] text-white font-medium rounded-xl hover:bg-[#1557ee] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {reviewing ? 'Збереження...' : 'Виставити оцінку'}
                   </button>
                   <button
                     onClick={handleReturnForRevision}
                     disabled={reviewing || !reviewFeedback.trim()}
-                    className={`flex-1 px-4 py-3 text-white font-medium rounded-xl transition-colors ${
+                    className={`flex-1 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white font-medium rounded-xl transition-colors ${
                       !reviewFeedback.trim() 
                         ? 'bg-gray-300 cursor-not-allowed' 
                         : 'bg-orange-500 hover:bg-orange-600'
@@ -742,7 +742,7 @@ export default function CuratorPage() {
                 </div>
                 <button
                   onClick={() => setSelectedHomework(null)}
-                  className="w-full px-4 py-3 bg-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-300 transition-colors"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base bg-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-300 transition-colors"
                 >
                   Скасувати
                 </button>
