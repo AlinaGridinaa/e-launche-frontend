@@ -64,10 +64,30 @@ export default function CuratorPage() {
         throw new Error('Failed to fetch file');
       }
       const blob = await response.blob();
+      
+      // Визначаємо тип файлу за розширенням, якщо blob.type невідомий
+      let fileType = blob.type;
+      if (!fileType || fileType === 'application/octet-stream') {
+        const extension = url.split('.').pop()?.toLowerCase();
+        const mimeTypes: Record<string, string> = {
+          'jpg': 'image/jpeg',
+          'jpeg': 'image/jpeg',
+          'png': 'image/png',
+          'gif': 'image/gif',
+          'webp': 'image/webp',
+          'pdf': 'application/pdf',
+          'doc': 'application/msword',
+          'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        };
+        fileType = mimeTypes[extension || ''] || 'application/octet-stream';
+      }
+      
       const blobUrl = URL.createObjectURL(blob);
       setPreviewBlob(blobUrl);
-      setPreviewFileType(blob.type);
-      console.log('Loaded file type:', blob.type);
+      setPreviewFileType(fileType);
+      console.log('URL:', url);
+      console.log('Blob type:', blob.type);
+      console.log('Detected type:', fileType);
     } catch (error) {
       console.error('Error loading file:', error);
       setPreviewError(true);
