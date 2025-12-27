@@ -563,7 +563,7 @@ export default function CuratorPage() {
       {/* Модальне вікно оцінювання */}
       {selectedHomework && (
         <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-          <div className="bg-white rounded-t-2xl sm:rounded-2xl max-w-md w-full max-h-[92vh] sm:max-h-[90vh] flex flex-col">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl max-w-md w-full max-h-[85vh] sm:max-h-[90vh] flex flex-col mb-16 sm:mb-0">
             <div className="flex-shrink-0 bg-white px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl">
               <h2 className="text-lg sm:text-xl font-bold text-black">Оцінити завдання</h2>
               <p className="text-xs sm:text-sm text-gray-600 mt-1">
@@ -720,12 +720,12 @@ export default function CuratorPage() {
             </div>
 
             {/* Кнопки дій - фіксовані знизу */}
-            <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4 sm:p-6 space-y-3">
+            <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4 sm:p-6 pb-safe space-y-3">
               <div className="flex gap-2 sm:gap-3">
                 <button
                   onClick={handleReviewSubmit}
                   disabled={reviewing}
-                  className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base bg-[#2466FF] text-white font-medium rounded-xl hover:bg-[#1557ee] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base bg-[#2466FF] text-white font-medium rounded-xl hover:bg-[#1557ee] active:bg-[#1557ee] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {reviewing ? 'Збереження...' : 'Виставити оцінку'}
                 </button>
@@ -735,7 +735,7 @@ export default function CuratorPage() {
                   className={`flex-1 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white font-medium rounded-xl transition-colors ${
                     !reviewFeedback.trim() 
                       ? 'bg-gray-300 cursor-not-allowed' 
-                      : 'bg-orange-500 hover:bg-orange-600'
+                      : 'bg-orange-500 hover:bg-orange-600 active:bg-orange-600'
                   } disabled:opacity-50`}
                   title={!reviewFeedback.trim() ? 'Введіть коментар перед поверненням' : 'Повернути на доопрацювання'}
                 >
@@ -744,7 +744,7 @@ export default function CuratorPage() {
               </div>
               <button
                 onClick={() => setSelectedHomework(null)}
-                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base bg-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-300 transition-colors"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base bg-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-300 active:bg-gray-300 transition-colors"
               >
                 Скасувати
               </button>
