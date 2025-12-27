@@ -489,7 +489,8 @@ export default function CuratorPage() {
                   <div className="grid grid-cols-2 gap-2">
                     {selectedHomework.fileAttachments.map((url: string, index: number) => {
                       const fileName = url.split('/').pop() || 'Файл';
-                      const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+                      // Cloudinary зображення мають /image/upload/ в URL
+                      const isImage = url.includes('/image/upload/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
                       
                       return (
                         <div key={index} className="relative group">
