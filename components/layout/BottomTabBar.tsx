@@ -56,7 +56,7 @@ export function BottomTabBar() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-4 px-4">
-      <div className="w-full max-w-md">
+      <div className="w-full">
         <div 
           className="bg-black/80 backdrop-blur-md rounded-full px-2 py-2 shadow-lg"
           style={{
