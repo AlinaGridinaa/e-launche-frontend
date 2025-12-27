@@ -492,11 +492,20 @@ export default function CuratorPage() {
                       // Cloudinary зображення мають /image/upload/ в URL
                       const isImage = url.includes('/image/upload/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
                       
+                      // Модифікуємо URL для inline відображення замість завантаження
+                      let viewUrl = url;
+                      if (url.includes('cloudinary.com')) {
+                        // Додаємо fl_attachment:false для показу замість завантаження
+                        if (url.includes('/upload/')) {
+                          viewUrl = url.replace('/upload/', '/upload/fl_attachment:false/');
+                        }
+                      }
+                      
                       return (
                         <div key={index} className="relative group">
                           {isImage ? (
                             <a
-                              href={url}
+                              href={viewUrl}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="block rounded-lg overflow-hidden border-2 border-green-200 hover:border-green-400 transition-colors"
@@ -514,7 +523,7 @@ export default function CuratorPage() {
                             </a>
                           ) : (
                             <a
-                              href={url}
+                              href={viewUrl}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex flex-col items-center justify-center gap-1 p-3 rounded-lg border-2 border-green-200 hover:border-green-400 transition-colors bg-white h-32"
