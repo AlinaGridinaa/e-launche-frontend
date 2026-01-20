@@ -277,12 +277,12 @@ export default function AchievementsPage() {
 
       {/* Submit Modal */}
       {showSubmitModal && selectedAchievement && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm ">
-          <div className="w-full max-w-md bg-white rounded-t-3xl shadow-2xl p-6 max-h-[90vh] min-h-[80vh] overflow-y-autop pb-24">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-white rounded-t-3xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto pb-32">
             {/* Close button */}
             <button
               onClick={() => setShowSubmitModal(false)}
-              className="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center"
+              className="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center z-10"
             >
               <X className="w-5 h-5 text-gray-600" />
             </button>

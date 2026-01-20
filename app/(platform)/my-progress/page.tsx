@@ -157,18 +157,16 @@ export default function MyProgressPage() {
 
         {/* Заголовок */}
         <div className="px-4 pt-12">
-          <h1 className="text-2xl font-bold text-white mb-4">Мій прогрес</h1>
-          
-          <div className="flex gap-2">
+          <div className="flex items-start justify-between mb-4">
+            <h1 className="text-2xl font-bold text-white">Мій прогрес</h1>
+            
             <button 
               onClick={() => router.push('/earnings')}
-              className="flex items-center gap-1 px-4 py-2.5 bg-black/20 backdrop-blur-md rounded-[13px] hover:bg-black/30 transition-colors"
+              className="flex items-center gap-2 px-5 py-3 bg-white rounded-2xl hover:bg-gray-100 transition-colors shadow-md"
             >
-              <Plus className="w-4 h-4 text-white" />
-              <span className="text-xs font-medium text-white">Додати дохід</span>
+              <Plus className="w-5 h-5 text-[#2466FF]" strokeWidth={2.5} />
+              <span className="text-sm font-bold text-[#2466FF]">Додати дохід</span>
             </button>
-            
-           
           </div>
         </div>
       </div>

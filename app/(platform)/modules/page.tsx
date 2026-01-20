@@ -29,6 +29,7 @@ export default function ModulesPage() {
   const { user } = useAuth();
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     loadModules();
@@ -91,6 +92,18 @@ export default function ModulesPage() {
   const totalModules = modules.length;
   const completedModules = modules.filter(m => m.lessonsCompleted === m.totalLessons && m.totalLessons > 0).length;
 
+  // Фільтруємо модулі за пошуковим запитом
+  const filteredModules = modules.filter(module => {
+    if (!searchQuery.trim()) return true;
+    
+    const query = searchQuery.toLowerCase();
+    const titleMatch = module.title.toLowerCase().includes(query);
+    const categoryMatch = module.category.toLowerCase().includes(query);
+    const numberMatch = module.number.toString().includes(query);
+    
+    return titleMatch || categoryMatch || numberMatch;
+  });
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F2F2F2] max-w-md mx-auto flex items-center justify-center">
@@ -140,20 +153,38 @@ export default function ModulesPage() {
             <input
               type="text"
               placeholder="Пошук..."
-              className="bg-transparent flex-1 text-sm outline-none placeholder:text-gray-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-transparent flex-1 text-sm outline-none placeholder:text-gray-500 text-gray-900"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
       </div>
 
       {/* Modules list */}
       <div className="max-w-md mx-auto px-4 pt-4 pb-24 space-y-3">
-        {modules.map((module) => (
-          <ModuleCard 
-            key={module.id} 
-            module={module}
-          />
-        ))}
+        {filteredModules.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-sm">
+              {searchQuery ? '🔍 Нічого не знайдено' : 'Модулі відсутні'}
+            </p>
+          </div>
+        ) : (
+          filteredModules.map((module) => (
+            <ModuleCard 
+              key={module.id} 
+              module={module}
+            />
+          ))
+        )}
 
         {/* Tariff Info */}
         {user && user.tariff && !user.isAdmin && !user.isCurator && (
