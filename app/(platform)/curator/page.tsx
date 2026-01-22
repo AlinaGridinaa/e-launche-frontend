@@ -298,7 +298,7 @@ export default function CuratorPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F5F5F5] max-w-md mx-auto flex items-center justify-center">
+      <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-[#2466FF] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-sm text-gray-500">Завантаження...</p>
@@ -308,7 +308,7 @@ export default function CuratorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] pb-24 max-w-md mx-auto">
+    <div className="min-h-screen bg-[#F5F5F5] pb-24">
       {/* Header */}
       <div className="bg-gradient-to-br from-[#2466FF] to-[#10A3FE] px-4 py-6 rounded-b-2xl">
         <div className="flex items-center gap-3 mb-4">
