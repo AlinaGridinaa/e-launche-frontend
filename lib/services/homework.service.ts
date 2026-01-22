@@ -37,6 +37,16 @@ export interface SubmitHomeworkDto {
 
 class HomeworkService {
   async submitHomework(dto: SubmitHomeworkDto, files?: File[]): Promise<Homework> {
+    console.log('🚀 HomeworkService.submitHomework called with:', {
+      moduleId: dto.moduleId,
+      lessonNumber: dto.lessonNumber,
+      answerLength: dto.answer.length,
+      attachmentsCount: dto.attachments?.length || 0,
+      attachments: dto.attachments,
+      filesCount: files?.length || 0,
+      fileNames: files?.map(f => f.name) || []
+    });
+    
     const formData = new FormData();
     formData.append('moduleId', dto.moduleId);
     formData.append('lessonNumber', String(dto.lessonNumber));
@@ -44,22 +54,38 @@ class HomeworkService {
     
     // Додаємо attachments як JSON string, бо FormData не підтримує масиви напряму
     if (dto.attachments && dto.attachments.length > 0) {
+      console.log('📎 Adding attachments to FormData:', dto.attachments);
       formData.append('attachments', JSON.stringify(dto.attachments));
     }
 
     // Додаємо файли
     if (files && files.length > 0) {
-      files.forEach((file) => {
+      console.log('📁 Adding files to FormData:', files.length);
+      files.forEach((file, index) => {
+        console.log(`  File ${index}: ${file.name}, ${file.size} bytes, ${file.type}`);
         formData.append('files', file);
       });
     }
 
-    const response = await axios.post(`${API_URL}/homework/submit`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response.data;
+    console.log('📤 Sending request to:', `${API_URL}/homework/submit`);
+    
+    try {
+      const response = await axios.post(`${API_URL}/homework/submit`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      console.log('✅ Homework submitted successfully:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Homework submission failed:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      throw error;
+    }
   }
 
   async getMyHomework(moduleId: string, lessonNumber: number): Promise<Homework | null> {

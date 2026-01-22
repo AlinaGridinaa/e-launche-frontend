@@ -130,6 +130,16 @@ export default function LessonPage() {
 
     try {
       setHomeworkLoading(true);
+      
+      console.log('📝 Submitting homework:', {
+        moduleId,
+        lessonNumber,
+        answer: homeworkAnswer,
+        attachments: homeworkAttachments,
+        filesCount: homeworkFiles.length,
+        fileNames: homeworkFileNames
+      });
+      
       const result = await homeworkService.submitHomework({
         moduleId,
         lessonNumber,
@@ -137,14 +147,23 @@ export default function LessonPage() {
         attachments: homeworkAttachments,
       }, homeworkFiles);
       
+      console.log('✅ Homework submitted successfully:', result);
+      
       setHomework(result);
       setHomeworkSubmitted(true);
       setHomeworkFiles([]);
       setHomeworkFileNames([]);
       alert('Домашнє завдання успішно відправлено! ✅');
     } catch (error: any) {
-      console.error('Failed to submit homework:', error);
-      alert(error.response?.data?.message || 'Помилка відправки домашнього завдання');
+      console.error('❌ Failed to submit homework:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      const errorMessage = error.response?.data?.message || error.message || 'Помилка відправки домашнього завдання';
+      alert(`Помилка: ${errorMessage}`);
     } finally {
       setHomeworkLoading(false);
     }
@@ -164,8 +183,23 @@ export default function LessonPage() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     
+    console.log('📎 Files selected:', files.length);
+    
+    if (files.length === 0) {
+      console.log('⚠️ No files selected');
+      return;
+    }
+    
+    // Перевіряємо кількість файлів
+    if (homeworkFiles.length + files.length > 5) {
+      alert('Максимум 5 файлів');
+      e.target.value = '';
+      return;
+    }
+    
     // Перевіряємо розмір файлів (max 20MB)
     const validFiles = files.filter(file => {
+      console.log(`📄 File: ${file.name}, Size: ${file.size} bytes`);
       if (file.size > 20 * 1024 * 1024) {
         alert(`${file.name} занадто великий (> 20MB)`);
         return false;
@@ -174,8 +208,14 @@ export default function LessonPage() {
     });
 
     if (validFiles.length > 0) {
-      setHomeworkFiles([...homeworkFiles, ...validFiles]);
-      setHomeworkFileNames([...homeworkFileNames, ...validFiles.map(f => f.name)]);
+      const newFiles = [...homeworkFiles, ...validFiles];
+      const newFileNames = [...homeworkFileNames, ...validFiles.map(f => f.name)];
+      
+      console.log('✅ Valid files added:', validFiles.length);
+      console.log('📋 Total files now:', newFiles.length);
+      
+      setHomeworkFiles(newFiles);
+      setHomeworkFileNames(newFileNames);
     }
     
     // Очищаємо input
