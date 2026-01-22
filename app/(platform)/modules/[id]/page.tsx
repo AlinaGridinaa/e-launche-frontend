@@ -255,108 +255,79 @@ function LessonCard({
   const thumbnailUrl = lesson.videoUrl ? getYouTubeThumbnail(lesson.videoUrl) : null;
 
   return (
-    <div className="relative">
-      {/* Video Thumbnail */}
-      <button
-        onClick={handleClick}
-        disabled={lesson.isLocked}
-        className="w-full relative h-[200px] rounded-2xl overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 group"
-      >
-        {/* YouTube thumbnail or gradient background */}
-        {thumbnailUrl ? (
-          <img 
-            src={thumbnailUrl} 
-            alt={lesson.title}
-            className="absolute inset-0 w-full h-full object-cover"
-            onError={(e) => {
-              // Fallback to gradient if thumbnail fails to load
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-900/40 via-gray-900 to-gray-900" />
-        )}
-        
-        {/* Dark overlay for better contrast */}
-        <div className="absolute inset-0 bg-black/20" />
-        
-        {/* Play button */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-10 h-10 rounded-full bg-[#2466FF] flex items-center justify-center group-hover:scale-110 transition-transform">
-            <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+    <button
+      onClick={handleClick}
+      disabled={lesson.isLocked}
+      className="w-full bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <div className="space-y-3">
+        {/* Badges */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Lesson number badge */}
+          <div className="inline-flex items-center bg-[#F2F2F2] rounded-full px-3 py-1.5">
+            <span className="text-xs font-bold text-black">
+              Урок {lessonNumber}
+            </span>
           </div>
-        </div>
 
-        {/* e-launch watermark */}
-        <div className="absolute top-4 left-4">
-          <span className="text-white/80 text-sm font-light tracking-wider">e-launch</span>
-        </div>
-      </button>
-
-      {/* Lesson Info Card - overlapping thumbnail */}
-      <div className="relative -mt-[75px] mx-3 bg-white backdrop-blur-sm rounded-2xl p-3 shadow-sm">
-        <div className="space-y-2">
-          {/* Badges */}
-          <div className="flex items-center gap-1 flex-wrap">
-            {/* Lesson number badge */}
-            <div className="inline-flex items-center bg-[#F2F2F2] rounded-full px-2 py-1.5">
-              <span className="text-xs font-bold text-black">
-                Урок {lessonNumber}
-              </span>
-            </div>
-
-            {/* Lesson status badge */}
-            <div
-              className={`inline-flex items-center gap-1 rounded-full px-2 py-1.5 ${
-                lesson.isCompleted
-                  ? 'bg-[#10B981]'
-                  : 'bg-[#F2F2F2]'
+          {/* Lesson status badge */}
+          <div
+            className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 ${
+              lesson.isCompleted
+                ? 'bg-[#10B981]'
+                : 'bg-[#F2F2F2]'
+            }`}
+          >
+            {lesson.isCompleted && (
+              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+            <span
+              className={`text-xs font-bold ${
+                lesson.isCompleted ? 'text-white' : 'text-[#7F7F7F]'
               }`}
             >
-              {lesson.isCompleted && (
-                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                </svg>
-              )}
-              <span
-                className={`text-xs font-bold ${
-                  lesson.isCompleted ? 'text-white' : 'text-[#7F7F7F]'
-                }`}
-              >
-                {lesson.isCompleted ? 'Пройдено' : 'Не пройдено'}
-              </span>
-            </div>
-
-            {/* Homework status badge */}
-            {lesson.homework && lesson.homeworkStatus && (
-              <div
-                className={`inline-flex items-center gap-1 rounded-full px-2 py-1.5 text-xs font-bold ${
-                  lesson.homeworkStatus === 'approved'
-                    ? 'bg-green-100 text-green-700'
-                    : lesson.homeworkStatus === 'needs_revision'
-                    ? 'bg-orange-100 text-orange-700'
-                    : lesson.homeworkStatus === 'reviewed'
-                    ? 'bg-blue-100 text-blue-700'
-                    : lesson.homeworkStatus === 'pending'
-                    ? 'bg-yellow-100 text-yellow-700'
-                    : 'bg-gray-100 text-gray-700'
-                }`}
-              >
-                {lesson.homeworkStatus === 'approved' && '✓ ДЗ: Затверджено'}
-                {lesson.homeworkStatus === 'needs_revision' && '⚠ ДЗ: На доопрац.'}
-                {lesson.homeworkStatus === 'reviewed' && '→ ДЗ: Перевірено'}
-                {lesson.homeworkStatus === 'pending' && '⏳ ДЗ: Очікує'}
-                {lesson.homeworkStatus === 'not_submitted' && '○ ДЗ: Не надано'}
-              </div>
-            )}
+              {lesson.isCompleted ? 'Пройдено' : 'Не пройдено'}
+            </span>
           </div>
 
-          {/* Lesson title */}
-          <h3 className="text-sm font-bold text-black leading-tight">
-            {lesson.title}
-          </h3>
+          {/* Homework status badge */}
+          {lesson.homework && lesson.homeworkStatus && (
+            <div
+              className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold ${
+                lesson.homeworkStatus === 'approved'
+                  ? 'bg-green-100 text-green-700'
+                  : lesson.homeworkStatus === 'needs_revision'
+                  ? 'bg-orange-100 text-orange-700'
+                  : lesson.homeworkStatus === 'reviewed'
+                  ? 'bg-blue-100 text-blue-700'
+                  : lesson.homeworkStatus === 'pending'
+                  ? 'bg-yellow-100 text-yellow-700'
+                  : 'bg-gray-100 text-gray-700'
+              }`}
+            >
+              {lesson.homeworkStatus === 'approved' && '✓ ДЗ: Затверджено'}
+              {lesson.homeworkStatus === 'needs_revision' && '⚠ ДЗ: На доопрац.'}
+              {lesson.homeworkStatus === 'reviewed' && '→ ДЗ: Перевірено'}
+              {lesson.homeworkStatus === 'pending' && '⏳ ДЗ: Очікує'}
+              {lesson.homeworkStatus === 'not_submitted' && '○ ДЗ: Не надано'}
+            </div>
+          )}
+        </div>
+
+        {/* Lesson title */}
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#2466FF] flex items-center justify-center">
+            <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base font-bold text-black leading-snug">
+              {lesson.title}
+            </h3>
+          </div>
         </div>
       </div>
-    </div>
+    </button>
   );
 }
