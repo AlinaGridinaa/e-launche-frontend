@@ -50,6 +50,16 @@ export function ScheduleModal({ isOpen, onClose }: ScheduleModalProps) {
     return acc;
   }, {} as Record<number, ScheduleEvent[]>);
   
+  // Фільтруємо тільки майбутні та сьогоднішні події для списку
+  const upcomingEvents = Object.values(eventsByDate)
+    .flat()
+    .filter(event => {
+      const eventDate = new Date(event.date);
+      eventDate.setHours(23, 59, 59, 999); // Встановлюємо кінець дня події
+      return eventDate >= new Date(new Date().setHours(0, 0, 0, 0)); // Порівнюємо з початком сьогоднішнього дня
+    })
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  
   const importantDates = Object.keys(eventsByDate).map(Number);
   
   // Отримати події для обраного дня
@@ -298,20 +308,20 @@ export function ScheduleModal({ isOpen, onClose }: ScheduleModalProps) {
             {/* Schedule section */}
             <div className="mt-4">
               <h2 className="text-lg font-bold text-gray-900 mb-3 border-b border-gray-200 pb-3">
-                🗓 Розклад першого тижня навчання
+                🗓 Актуальні події
               </h2>
 
               {loading ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
                 </div>
-              ) : Object.values(eventsByDate).flat().length === 0 ? (
+              ) : upcomingEvents.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
-                  Немає заплановованих подій на цей місяць
+                  Немає заплановованих подій
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {Object.values(eventsByDate).flat().map((event) => {
+                  {upcomingEvents.map((event) => {
                     const eventDate = new Date(event.date);
                     const day = eventDate.getDate();
                     const monthNames = [
