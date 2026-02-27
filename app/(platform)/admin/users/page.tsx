@@ -414,9 +414,8 @@ export default function AdminUsersPage() {
       if (editUser.group?.trim()) {
         updateData.group = editUser.group.trim();
       }
-      if (editUser.accessUntil?.trim()) {
-        updateData.accessUntil = editUser.accessUntil.trim();
-      }
+      // Завжди надсилаємо accessUntil (порожній рядок = безстроковий доступ)
+      updateData.accessUntil = editUser.accessUntil?.trim() || '';
       if (editUser.tariff?.trim()) {
         updateData.tariff = editUser.tariff.trim();
       }
