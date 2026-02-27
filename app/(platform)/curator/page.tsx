@@ -2,16 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, BookOpen, Users, ClipboardCheck } from 'lucide-react';
+import { ChevronLeft, BookOpen, Users, ClipboardCheck, Award, ExternalLink, FileText, Link as LinkIcon, CheckCircle, XCircle } from 'lucide-react';
 import { curatorService, Homework, Student, CuratorModule } from '@/lib/services/curator.service';
+import { achievementsService } from '@/lib/services/achievements.service';
 import AudioRecorder from '@/components/AudioRecorder';
 
 export default function CuratorPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'homeworks' | 'modules' | 'students'>('homeworks');
+  const [activeTab, setActiveTab] = useState<'homeworks' | 'modules' | 'students' | 'achievements'>('homeworks');
   const [homeworks, setHomeworks] = useState<Homework[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [modules, setModules] = useState<CuratorModule[]>([]);
+  const [achievements, setAchievements] = useState<any[]>([]);
+  const [selectedAchievement, setSelectedAchievement] = useState<any | null>(null);
+  const [reviewingAchievement, setReviewingAchievement] = useState(false);
+  const [achievementComment, setAchievementComment] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [selectedHomework, setSelectedHomework] = useState<Homework | null>(null);
   const [reviewScore, setReviewScore] = useState<number>(0);
@@ -184,14 +189,16 @@ export default function CuratorPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [homeworksData, studentsData, modulesData] = await Promise.all([
+      const [homeworksData, studentsData, modulesData, achievementsData] = await Promise.all([
         curatorService.getHomeworks(),
         curatorService.getMyStudents(),
         curatorService.getAllModules(),
+        achievementsService.getPendingAchievements(),
       ]);
       setHomeworks(homeworksData);
       setStudents(studentsData);
       setModules(modulesData);
+      setAchievements(achievementsData);
     } catch (error) {
       console.error('Failed to load curator data:', error);
     } finally {
@@ -280,6 +287,51 @@ export default function CuratorPage() {
     }
   };
 
+  const handleApproveAchievement = async () => {
+    if (!selectedAchievement) return;
+
+    try {
+      setReviewingAchievement(true);
+      await achievementsService.approveAchievement(selectedAchievement._id, achievementComment || undefined);
+      
+      // Оновлюємо локальний стан
+      setAchievements(achievements.filter(a => a._id !== selectedAchievement._id));
+      setSelectedAchievement(null);
+      setAchievementComment('');
+      alert('Нагороду схвалено! 🏆');
+    } catch (error: any) {
+      console.error('Failed to approve achievement:', error);
+      alert(error.response?.data?.message || 'Помилка схвалення');
+    } finally {
+      setReviewingAchievement(false);
+    }
+  };
+
+  const handleRejectAchievement = async () => {
+    if (!selectedAchievement) return;
+
+    if (!achievementComment.trim()) {
+      alert('Введіть коментар для студента');
+      return;
+    }
+
+    try {
+      setReviewingAchievement(true);
+      await achievementsService.rejectAchievement(selectedAchievement._id, achievementComment);
+      
+      // Оновлюємо локальний стан
+      setAchievements(achievements.filter(a => a._id !== selectedAchievement._id));
+      setSelectedAchievement(null);
+      setAchievementComment('');
+      alert('Заявку відхилено');
+    } catch (error: any) {
+      console.error('Failed to reject achievement:', error);
+      alert(error.response?.data?.message || 'Помилка відхилення');
+    } finally {
+      setReviewingAchievement(false);
+    }
+  };
+
   // Фільтрація домашніх завдань
   const filteredHomeworks = homeworks.filter((hw) => {
     // Фільтр по пошуку (ім'я студента або номер модуля)
@@ -328,22 +380,22 @@ export default function CuratorPage() {
             <p className="text-2xl font-bold text-white">{homeworks.length}</p>
           </div>
           <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
-            <p className="text-xs text-white/80">Студентів</p>
-            <p className="text-2xl font-bold text-white">{students.length}</p>
+            <p className="text-xs text-white/80">Нагород</p>
+            <p className="text-2xl font-bold text-white">{achievements.length}</p>
           </div>
           <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
-            <p className="text-xs text-white/80">Модулів</p>
-            <p className="text-2xl font-bold text-white">{modules.length}</p>
+            <p className="text-xs text-white/80">Студентів</p>
+            <p className="text-2xl font-bold text-white">{students.length}</p>
           </div>
         </div>
       </div>
 
       {/* Таби */}
       <div className="px-4 mt-4">
-        <div className="flex gap-2">
+        <div className="flex gap-2 overflow-x-auto">
           <button
             onClick={() => setActiveTab('homeworks')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap ${
               activeTab === 'homeworks'
                 ? 'bg-[#2466FF] text-white'
                 : 'bg-white text-gray-700'
@@ -353,8 +405,19 @@ export default function CuratorPage() {
             Домашні завдання
           </button>
           <button
+            onClick={() => setActiveTab('achievements')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap ${
+              activeTab === 'achievements'
+                ? 'bg-[#2466FF] text-white'
+                : 'bg-white text-gray-700'
+            }`}
+          >
+            <Award className="w-4 h-4" />
+            Нагороди {achievements.length > 0 && <span className="ml-1 px-2 py-0.5 bg-red-500 text-white text-xs rounded-full">{achievements.length}</span>}
+          </button>
+          <button
             onClick={() => setActiveTab('modules')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap ${
               activeTab === 'modules'
                 ? 'bg-[#2466FF] text-white'
                 : 'bg-white text-gray-700'
@@ -365,7 +428,7 @@ export default function CuratorPage() {
           </button>
           <button
             onClick={() => setActiveTab('students')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap ${
               activeTab === 'students'
                 ? 'bg-[#2466FF] text-white'
                 : 'bg-white text-gray-700'
@@ -556,6 +619,46 @@ export default function CuratorPage() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {activeTab === 'achievements' && (
+          <div className="space-y-3">
+            {achievements.length === 0 ? (
+              <div className="text-center py-12">
+                <Award className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-sm text-gray-500">Немає заявок на нагороди</p>
+              </div>
+            ) : (
+              achievements.map((achievement) => (
+                <div
+                  key={achievement._id}
+                  onClick={() => setSelectedAchievement(achievement)}
+                  className="bg-white rounded-2xl p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="text-3xl">{achievement.achievementType?.emoji || '🏆'}</div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-sm text-black mb-1">
+                        {achievement.achievementType?.title || 'Нагорода'}
+                      </h3>
+                      <p className="text-xs text-gray-600 mb-2">
+                        {achievement.userId?.firstName} {achievement.userId?.lastName}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        📅 {new Date(achievement.submittedAt).toLocaleDateString('uk-UA', { 
+                          day: 'numeric', 
+                          month: 'long',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                    <ChevronLeft className="w-5 h-5 text-gray-400 rotate-180" />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         )}
       </div>
@@ -861,6 +964,129 @@ export default function CuratorPage() {
                   );
                 })()
               ) : null}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модальне вікно перегляду нагороди */}
+      {selectedAchievement && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-white rounded-t-3xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto pb-24">
+            {/* Close button */}
+            <button
+              onClick={() => {
+                setSelectedAchievement(null);
+                setAchievementComment('');
+              }}
+              className="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center"
+            >
+              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="text-center mb-6">
+              <div className="text-5xl mb-3">{selectedAchievement.achievementType?.emoji || '🏆'}</div>
+              <h2 className="text-xl font-bold text-black mb-2">
+                {selectedAchievement.achievementType?.title || 'Нагорода'}
+              </h2>
+              <p className="text-sm text-gray-600 mb-1">
+                {selectedAchievement.userId?.firstName} {selectedAchievement.userId?.lastName}
+              </p>
+              <p className="text-xs text-gray-500">
+                {selectedAchievement.userId?.email}
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {/* Опис нагороди */}
+              <div className="bg-purple-50 rounded-xl p-4">
+                <p className="text-xs font-medium text-purple-900 mb-1">Опис нагороди:</p>
+                <p className="text-sm text-purple-700">
+                  {selectedAchievement.achievementType?.description || 'Без опису'}
+                </p>
+              </div>
+
+              {/* Текстове підтвердження */}
+              {selectedAchievement.proofText && (
+                <div className="bg-gray-50 rounded-xl p-4">
+                  <p className="text-xs font-medium text-gray-600 mb-2 flex items-center gap-1">
+                    <FileText className="w-3 h-3" /> Текстове підтвердження:
+                  </p>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedAchievement.proofText}</p>
+                </div>
+              )}
+
+              {/* Файл */}
+              {selectedAchievement.proofFile && (
+                <div className="bg-blue-50 rounded-xl p-4">
+                  <p className="text-xs font-medium text-blue-900 mb-2 flex items-center gap-1">
+                    <FileText className="w-3 h-3" /> Файл підтвердження:
+                  </p>
+                  <a
+                    href={selectedAchievement.proofFile}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Відкрити файл
+                  </a>
+                </div>
+              )}
+
+              {/* Посилання */}
+              {selectedAchievement.proofLink && (
+                <div className="bg-green-50 rounded-xl p-4">
+                  <p className="text-xs font-medium text-green-900 mb-2 flex items-center gap-1">
+                    <LinkIcon className="w-3 h-3" /> Посилання:
+                  </p>
+                  <a
+                    href={selectedAchievement.proofLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm text-green-600 hover:text-green-700 font-medium break-all"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    {selectedAchievement.proofLink}
+                  </a>
+                </div>
+              )}
+
+              {/* Коментар куратора */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Коментар для студента (опціонально)
+                </label>
+                <textarea
+                  value={achievementComment}
+                  onChange={(e) => setAchievementComment(e.target.value)}
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2466FF] text-black resize-none"
+                  placeholder="Додайте коментар..."
+                />
+              </div>
+
+              {/* Кнопки дій */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={handleRejectAchievement}
+                  disabled={reviewingAchievement}
+                  className="flex-1 px-4 py-3 bg-red-500 text-white font-medium rounded-xl hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <XCircle className="w-5 h-5" />
+                  {reviewingAchievement ? 'Обробка...' : 'Відхилити'}
+                </button>
+                <button
+                  onClick={handleApproveAchievement}
+                  disabled={reviewingAchievement}
+                  className="flex-1 px-4 py-3 bg-green-500 text-white font-medium rounded-xl hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <CheckCircle className="w-5 h-5" />
+                  {reviewingAchievement ? 'Обробка...' : 'Схвалити'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
