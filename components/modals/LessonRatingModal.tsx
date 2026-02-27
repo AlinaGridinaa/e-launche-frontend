@@ -26,14 +26,10 @@ export default function LessonRatingModal({
   if (!isOpen) return null;
 
   const handleSubmit = async () => {
-    if (moodRating === null || usefulnessRating === null) {
-      alert('Будь ласка, поставте обидві оцінки');
-      return;
-    }
-
     try {
       setSubmitting(true);
-      await onSubmit(moodRating, usefulnessRating);
+      // Відправляємо оцінки (або 0, якщо не поставлено)
+      await onSubmit(moodRating || 0, usefulnessRating || 0);
       onClose();
     } catch (error) {
       console.error('Failed to submit rating:', error);
@@ -71,7 +67,7 @@ export default function LessonRatingModal({
           {/* Mood Rating */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
-              Настрій після уроку:
+              Настрій після уроку: <span className="text-gray-400 text-xs font-normal">(необов'язково)</span>
             </label>
             <div className="flex justify-between gap-2">
               {moodEmojis.map((emoji, index) => (
@@ -94,7 +90,7 @@ export default function LessonRatingModal({
           {/* Usefulness Rating */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
-              Наскільки зрозуміла інформація?
+              Наскільки зрозуміла інформація? <span className="text-gray-400 text-xs font-normal">(необов'язково)</span>
             </label>
             <div className="flex justify-center gap-2">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -126,19 +122,20 @@ export default function LessonRatingModal({
           )}
 
           {/* Buttons */}
-          <div className="flex gap-3 pt-4">
-            <button
-              onClick={handleSkip}
-              className="flex-1 px-4 py-3 bg-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-300 transition-colors"
-            >
-              Пропустити
-            </button>
+          <div className="flex flex-col gap-3 pt-4">
             <button
               onClick={handleSubmit}
-              disabled={submitting || moodRating === null || usefulnessRating === null}
-              className="flex-1 px-4 py-3 bg-[#2466FF] text-white font-medium rounded-xl hover:bg-[#1557ee] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={submitting}
+              className="w-full px-4 py-3 bg-[#2466FF] text-white font-medium rounded-xl hover:bg-[#1557ee] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {submitting ? 'Збереження...' : 'Зберегти'}
+              {submitting ? 'Збереження...' : 'Позначити як пройдений'}
+            </button>
+            <button
+              onClick={handleSkip}
+              disabled={submitting}
+              className="w-full px-4 py-3 bg-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-300 transition-colors disabled:opacity-50"
+            >
+              Пропустити оцінку
             </button>
           </div>
         </div>
